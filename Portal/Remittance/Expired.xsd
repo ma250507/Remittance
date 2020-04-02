@@ -1,0 +1,81 @@
+<?xml version="1.0" standalone="yes"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="MyTable">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TransactionCode" type="xs:string" minOccurs="0" />
+              <xs:element name="CountryCode" type="xs:string" minOccurs="0" />
+              <xs:element name="BankCode" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMId" type="xs:string" minOccurs="0" />
+              <xs:element name="RequestType" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMDate" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMTime" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMTrxSequence" type="xs:string" minOccurs="0" />
+              <xs:element name="DepositorMobile" type="xs:string" minOccurs="0" />
+              <xs:element name="DepositorPIN" type="xs:string" minOccurs="0" />
+              <xs:element name="BeneficiaryMobile" type="xs:string" minOccurs="0" />
+              <xs:element name="BeneficiaryPIN" type="xs:string" minOccurs="0" />
+              <xs:element name="Amount" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CurrencyCode" type="xs:string" minOccurs="0" />
+              <xs:element name="DepositDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="DepositActionReason" type="xs:string" minOccurs="0" />
+              <xs:element name="DepositStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="WithdrawalStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="WithdrawalDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="CancelStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="CancelDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="OverallStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="SMSSendingStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="SMSSentDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="WSendingStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="WSentDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ResendSMSFlag" type="xs:int" minOccurs="0" />
+              <xs:element name="ResendTo" type="xs:int" minOccurs="0" />
+              <xs:element name="ResendSMSDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="SMSLanguage" type="xs:string" minOccurs="0" />
+              <xs:element name="RedemptionPIN" type="xs:string" minOccurs="0" />
+              <xs:element name="DepositHostFlag" type="xs:boolean" minOccurs="0" />
+              <xs:element name="WithdrawalHostFlag" type="xs:int" minOccurs="0" />
+              <xs:element name="DepositorID" type="xs:string" minOccurs="0" />
+              <xs:element name="BeneficiaryID" type="xs:string" minOccurs="0" />
+              <xs:element name="HostDResponse" type="xs:string" minOccurs="0" />
+              <xs:element name="HostWResponse" type="xs:string" minOccurs="0" />
+              <xs:element name="HostDUpdateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="HostWUpdateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ReActivationCounter" type="xs:int" minOccurs="0" />
+              <xs:element name="PaymentType" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMName" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Details">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TransactionCode" type="xs:string" minOccurs="0" />
+              <xs:element name="Action" type="xs:string" minOccurs="0" />
+              <xs:element name="ActionDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ActionReason" type="xs:string" minOccurs="0" />
+              <xs:element name="ActionStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="DispensedNotes" type="xs:string" minOccurs="0" />
+              <xs:element name="DispensedAmount" type="xs:int" minOccurs="0" />
+              <xs:element name="CommissionAmount" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette1" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette2" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette3" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette4" type="xs:int" minOccurs="0" />
+              <xs:element name="CountryCode" type="xs:string" minOccurs="0" />
+              <xs:element name="BankCode" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMId" type="xs:string" minOccurs="0" />
+              <xs:element name="ATMTrxSequence" type="xs:string" minOccurs="0" />
+              <xs:element name="DispensedCurrencyCode" type="xs:string" minOccurs="0" />
+              <xs:element name="DispensedRate" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

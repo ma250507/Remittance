@@ -1,0 +1,122 @@
+<%@ Master Language="VB" CodeFile="MasterPage.master.vb" Inherits="MasterPage" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>BANK NAME</title>
+
+
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<link href="css/diQuery-collapsiblePanel.css" rel="stylesheet" type="text/css" />
+ <link rel="stylesheet" href="css/nivo-slider.css" type="text/css" media="screen" />
+ <link type="text/css" rel="stylesheet" href="css/datepickercontrol.css"/> 
+<link rel="stylesheet" href="css/example.css" type="text/css" media="screen"/>
+
+
+ <script type="text/javascript" src="scripts/datepickercontrol.js"></script>
+ <script type="text/javascript" src="scripts/jquery-1.4.3.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.nivo.slider.pack.js"></script>
+    <script type="text/javascript" src="scripts/diQuery-collapsiblePanel.js"></script>
+    <script type="text/javascript">
+    $(window).load(function() {
+        $('#slider').nivoSlider( {effect:'fade', //Specify sets like: 'fold,fade,sliceDown'
+        slices:15,
+        animSpeed:500, //Slide transition speed
+        pauseTime:3000,
+        startSlide:0, //Set starting Slide (0 index)
+        directionNav:false , //Next & Prev
+        directionNavHide:true, //Only show on hover
+        controlNav:false , //1,2,3...
+        controlNavThumbs:false, //Use thumbnails for Control Nav
+        controlNavThumbsFromRel:false, //Use image rel for thumbs
+        controlNavThumbsSearch: '.jpg', //Replace this with...
+        controlNavThumbsReplace: '_thumb.jpg', //...this in thumb Image src
+        keyboardNav:false , //Use left & right arrows
+        pauseOnHover:true, //Stop animation while hovering
+        manualAdvance:false, //Force manual transitions
+        captionOpacity:0.8, //Universal caption opacity
+        beforeChange: function(){},
+        afterChange: function(){},
+        slideshowEnd: function(){}, //Triggers after all slides have been shown
+        lastSlide: function(){}, //Triggers when last slide is shown
+        afterLoad: function(){} //Triggers when slider has loaded
+        });
+    });
+   
+    </script>
+    <script language="javascript" type="text/javascript">
+    $(document).ready(function() {
+        $(".collapsibleContainer").collapsiblePanel();
+    });
+</script>
+</head>
+<body>
+    <form id="form1" runat="server">
+<div id="main">
+
+  <div id="logo"  >&nbsp;
+  <div id="navbar"  >
+      <ul id="Menu" runat="server" >
+        <li id="Report" runat="server" ><a href="Reports.aspx">Reports</a></li>
+        <li id="Maintenance" runat="server" ><a href="Maintenance-Main.aspx">Maintenance</a></li>
+        <li id="Teller" runat="server" ><a href="Teller-Main.aspx">Teller</a></li>
+        <li id="Users" runat="server" ><a href="Users-Main.aspx">Users</a></li>
+        <li id="Register" runat="server" ><a href="Registeration.aspx">Register</a></li>
+        <li id="Admin" runat="server" ><a href="Admin.aspx">Admin</a></li>
+      </ul>
+    </div>
+
+    <img  id="Logo-img" src="Images/ULogo.png" style="height: 84px; width: 300px" 
+          alt="Home" /> 
+  </div>
+
+  <div id="mainphoto">
+    <%-- <div id="slider-wrapper">
+        
+            <div id="slider" class="nivoSlider">
+                <img src="images/1.jpg" alt="" />
+                <img src="images/2.jpg" alt="" />
+            </div>
+            <div id="htmlcaption" class="nivo-html-caption">
+                <strong>This</strong> is a test <em>HTML</em> caption with <a href="#">a link</a>
+            </div>
+        
+        </div>
+--%>
+  </div>
+  <div class="clear">
+      <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server">
+      
+      </asp:ContentPlaceHolder>
+        </div>
+  <div id="main-inner">
+    <div id="main-inner-left">
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        </asp:ContentPlaceHolder>
+    </div>
+    <div id="main-inner-right">
+    <asp:ContentPlaceHolder ID="ContentPlaceHolder3" runat="server">
+       
+             <asp:Button ID="Btn_LogOut" runat="server" Font-Bold="True" Text="Log Out" style="height: 26px"/>
+             <asp:Button ID="Btn_Home" runat="server" Font-Bold="True" style="height: 26px" 
+                 Text="Home" />
+             <asp:Button ID="Btn_ChangePassword" runat="server" Font-Bold="True" 
+                 Text="Change Password" Width="155px" style="height: 26px"/>
+       
+             </asp:ContentPlaceHolder>
+    </div>
+    <div class="clear">
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder4" runat="server">
+        </asp:ContentPlaceHolder>
+      </div>
+  </div>
+  <div class="clear"></div>
+</div>
+<div id="footer">
+  <a href="http://www.NCR.com/" target="_blank" style="text-decoration:none;">
+    Copyright © NCR </a></div>
+    </form>
+</body>
+</html>
+

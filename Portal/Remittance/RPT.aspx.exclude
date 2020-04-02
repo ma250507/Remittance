@@ -1,0 +1,26 @@
+﻿<%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="RPT.aspx.vb" Inherits="RPT" title="Untitled Page" %>
+
+<%@ Register assembly="CrystalDecisions.Web, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" namespace="CrystalDecisions.Web" tagprefix="CR" %>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" Runat="Server">
+    <div class="collapsibleContainer" title="Show/Hide">
+<CR:CrystalReportViewer ID="CrystalReportViewer1" runat="server" 
+        AutoDataBind="true" DisplayGroupTree="False" 
+        HasCrystalLogo="False" HasDrillUpButton="False" 
+        HasToggleGroupTreeButton="False" HasZoomFactorList="False" 
+    PrintMode="ActiveX" BestFitPage="False" Height="1500px" Width="1050px" 
+        EnableTheming="False" EnableToolTips="False" HasViewList="False" ></CR:CrystalReportViewer>
+</div>
+</asp:Content>
+<asp:Content ID="Content3" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content5" ContentPlaceHolderID="ContentPlaceHolder4" Runat="Server">
+    
+    <asp:Label ID="Lbl_Status" runat="server" Font-Bold="True" Font-Size="Medium" 
+        ForeColor="Red" style="text-align: center" Visible="False"></asp:Label>
+    <br />
+</asp:Content>
+
+
+
+

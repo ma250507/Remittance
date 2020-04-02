@@ -1,0 +1,19 @@
+﻿.collapsibleContainer
+{	width: 1100px;
+}
+
+.collapsibleContainerTitle
+{
+    cursor:pointer;
+}
+
+.collapsibleContainerTitle div
+{
+    padding-top:5px;
+    padding-left:10px;
+}
+
+.collapsibleContainerContent
+{
+    
+}

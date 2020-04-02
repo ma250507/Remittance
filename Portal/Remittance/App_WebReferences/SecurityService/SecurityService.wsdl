@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="GetUserName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetActiveUsers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetActiveUsersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetActiveUsersResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAllUsers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAllUsersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAllUsersResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="chkApplication">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="argApp" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="chkApplicationResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="chkApplicationResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ByteArrayToString">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="arrInput" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ByteArrayToStringResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ByteArrayToStringResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsAlphastring">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strToCheck" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsAlphastringResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsAlphastringResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsAlphaNumeric">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strToCheck" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsAlphaNumericResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsAlphaNumericResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getGroup1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argUserId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argPassword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getGroup1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getGroup1Result" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getGroup2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argUserId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argPassword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getGroup2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getGroup2Result" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FixSqlStr">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Text" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FixSqlStrResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FixSqlStrResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StopUser">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argUser" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StopUserResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="StopUserResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdPass">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argUser" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argNewPass" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdPassResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdPassResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="inst_log">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argsql_st" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="arguserid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="inst_logResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="inst_logResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getGroup">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="argUserId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argPassword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="argprg_id" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getGroupResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getGroupResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetUserNameSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserName" />
+  </wsdl:message>
+  <wsdl:message name="GetUserNameSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetActiveUsersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetActiveUsers" />
+  </wsdl:message>
+  <wsdl:message name="GetActiveUsersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetActiveUsersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAllUsersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAllUsers" />
+  </wsdl:message>
+  <wsdl:message name="GetAllUsersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAllUsersResponse" />
+  </wsdl:message>
+  <wsdl:message name="chkApplicationSoapIn">
+    <wsdl:part name="parameters" element="tns:chkApplication" />
+  </wsdl:message>
+  <wsdl:message name="chkApplicationSoapOut">
+    <wsdl:part name="parameters" element="tns:chkApplicationResponse" />
+  </wsdl:message>
+  <wsdl:message name="ByteArrayToStringSoapIn">
+    <wsdl:part name="parameters" element="tns:ByteArrayToString" />
+  </wsdl:message>
+  <wsdl:message name="ByteArrayToStringSoapOut">
+    <wsdl:part name="parameters" element="tns:ByteArrayToStringResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsAlphastringSoapIn">
+    <wsdl:part name="parameters" element="tns:IsAlphastring" />
+  </wsdl:message>
+  <wsdl:message name="IsAlphastringSoapOut">
+    <wsdl:part name="parameters" element="tns:IsAlphastringResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsAlphaNumericSoapIn">
+    <wsdl:part name="parameters" element="tns:IsAlphaNumeric" />
+  </wsdl:message>
+  <wsdl:message name="IsAlphaNumericSoapOut">
+    <wsdl:part name="parameters" element="tns:IsAlphaNumericResponse" />
+  </wsdl:message>
+  <wsdl:message name="getGroup1SoapIn">
+    <wsdl:part name="parameters" element="tns:getGroup1" />
+  </wsdl:message>
+  <wsdl:message name="getGroup1SoapOut">
+    <wsdl:part name="parameters" element="tns:getGroup1Response" />
+  </wsdl:message>
+  <wsdl:message name="getGroup2SoapIn">
+    <wsdl:part name="parameters" element="tns:getGroup2" />
+  </wsdl:message>
+  <wsdl:message name="getGroup2SoapOut">
+    <wsdl:part name="parameters" element="tns:getGroup2Response" />
+  </wsdl:message>
+  <wsdl:message name="FixSqlStrSoapIn">
+    <wsdl:part name="parameters" element="tns:FixSqlStr" />
+  </wsdl:message>
+  <wsdl:message name="FixSqlStrSoapOut">
+    <wsdl:part name="parameters" element="tns:FixSqlStrResponse" />
+  </wsdl:message>
+  <wsdl:message name="StopUserSoapIn">
+    <wsdl:part name="parameters" element="tns:StopUser" />
+  </wsdl:message>
+  <wsdl:message name="StopUserSoapOut">
+    <wsdl:part name="parameters" element="tns:StopUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdPassSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdPass" />
+  </wsdl:message>
+  <wsdl:message name="UpdPassSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdPassResponse" />
+  </wsdl:message>
+  <wsdl:message name="inst_logSoapIn">
+    <wsdl:part name="parameters" element="tns:inst_log" />
+  </wsdl:message>
+  <wsdl:message name="inst_logSoapOut">
+    <wsdl:part name="parameters" element="tns:inst_logResponse" />
+  </wsdl:message>
+  <wsdl:message name="getGroupSoapIn">
+    <wsdl:part name="parameters" element="tns:getGroup" />
+  </wsdl:message>
+  <wsdl:message name="getGroupSoapOut">
+    <wsdl:part name="parameters" element="tns:getGroupResponse" />
+  </wsdl:message>
+  <wsdl:portType name="SecurityServiceSoap">
+    <wsdl:operation name="GetUserName">
+      <wsdl:input message="tns:GetUserNameSoapIn" />
+      <wsdl:output message="tns:GetUserNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetActiveUsers">
+      <wsdl:input message="tns:GetActiveUsersSoapIn" />
+      <wsdl:output message="tns:GetActiveUsersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllUsers">
+      <wsdl:input message="tns:GetAllUsersSoapIn" />
+      <wsdl:output message="tns:GetAllUsersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="chkApplication">
+      <wsdl:input message="tns:chkApplicationSoapIn" />
+      <wsdl:output message="tns:chkApplicationSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ByteArrayToString">
+      <wsdl:input message="tns:ByteArrayToStringSoapIn" />
+      <wsdl:output message="tns:ByteArrayToStringSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsAlphastring">
+      <wsdl:input message="tns:IsAlphastringSoapIn" />
+      <wsdl:output message="tns:IsAlphastringSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsAlphaNumeric">
+      <wsdl:input message="tns:IsAlphaNumericSoapIn" />
+      <wsdl:output message="tns:IsAlphaNumericSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getGroup1">
+      <wsdl:input message="tns:getGroup1SoapIn" />
+      <wsdl:output message="tns:getGroup1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getGroup2">
+      <wsdl:input message="tns:getGroup2SoapIn" />
+      <wsdl:output message="tns:getGroup2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="FixSqlStr">
+      <wsdl:input message="tns:FixSqlStrSoapIn" />
+      <wsdl:output message="tns:FixSqlStrSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="StopUser">
+      <wsdl:input message="tns:StopUserSoapIn" />
+      <wsdl:output message="tns:StopUserSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdPass">
+      <wsdl:input message="tns:UpdPassSoapIn" />
+      <wsdl:output message="tns:UpdPassSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="inst_log">
+      <wsdl:input message="tns:inst_logSoapIn" />
+      <wsdl:output message="tns:inst_logSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getGroup">
+      <wsdl:input message="tns:getGroupSoapIn" />
+      <wsdl:output message="tns:getGroupSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SecurityServiceSoap" type="tns:SecurityServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUserName">
+      <soap:operation soapAction="http://tempuri.org/GetUserName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetActiveUsers">
+      <soap:operation soapAction="http://tempuri.org/GetActiveUsers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllUsers">
+      <soap:operation soapAction="http://tempuri.org/GetAllUsers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="chkApplication">
+      <soap:operation soapAction="http://tempuri.org/chkApplication" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ByteArrayToString">
+      <soap:operation soapAction="http://tempuri.org/ByteArrayToString" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsAlphastring">
+      <soap:operation soapAction="http://tempuri.org/IsAlphastring" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsAlphaNumeric">
+      <soap:operation soapAction="http://tempuri.org/IsAlphaNumeric" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroup1">
+      <soap:operation soapAction="http://tempuri.org/getGroup1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroup2">
+      <soap:operation soapAction="http://tempuri.org/getGroup2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FixSqlStr">
+      <soap:operation soapAction="http://tempuri.org/FixSqlStr" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StopUser">
+      <soap:operation soapAction="http://tempuri.org/StopUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdPass">
+      <soap:operation soapAction="http://tempuri.org/UpdPass" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="inst_log">
+      <soap:operation soapAction="http://tempuri.org/inst_log" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroup">
+      <soap:operation soapAction="http://tempuri.org/getGroup" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SecurityServiceSoap12" type="tns:SecurityServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUserName">
+      <soap12:operation soapAction="http://tempuri.org/GetUserName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetActiveUsers">
+      <soap12:operation soapAction="http://tempuri.org/GetActiveUsers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllUsers">
+      <soap12:operation soapAction="http://tempuri.org/GetAllUsers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="chkApplication">
+      <soap12:operation soapAction="http://tempuri.org/chkApplication" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ByteArrayToString">
+      <soap12:operation soapAction="http://tempuri.org/ByteArrayToString" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsAlphastring">
+      <soap12:operation soapAction="http://tempuri.org/IsAlphastring" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsAlphaNumeric">
+      <soap12:operation soapAction="http://tempuri.org/IsAlphaNumeric" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroup1">
+      <soap12:operation soapAction="http://tempuri.org/getGroup1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroup2">
+      <soap12:operation soapAction="http://tempuri.org/getGroup2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FixSqlStr">
+      <soap12:operation soapAction="http://tempuri.org/FixSqlStr" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StopUser">
+      <soap12:operation soapAction="http://tempuri.org/StopUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdPass">
+      <soap12:operation soapAction="http://tempuri.org/UpdPass" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="inst_log">
+      <soap12:operation soapAction="http://tempuri.org/inst_log" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroup">
+      <soap12:operation soapAction="http://tempuri.org/getGroup" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SecurityService">
+    <wsdl:port name="SecurityServiceSoap" binding="tns:SecurityServiceSoap">
+      <soap:address location="http://172.16.20.96/Securitytest/SecurityService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SecurityServiceSoap12" binding="tns:SecurityServiceSoap12">
+      <soap12:address location="http://172.16.20.96/Securitytest/SecurityService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

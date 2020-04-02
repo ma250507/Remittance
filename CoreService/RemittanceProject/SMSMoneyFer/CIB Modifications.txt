@@ -1,0 +1,13 @@
+SMS have to be sent to both Depositor and Beneficiary when the transaction is expired or Withdrawn by any of them.
+=================================================================================================
+added with new tag in the config.ml file under <SMSService> tag as below
+<SMSService>
+	<DepositorTrxExpirationSMSBody_B>Your transfer transaction with Trx code [TC] has EXPIRED.</DepositorTrxExpirationSMSBody_B>
+
+Apply Limit on the number of trials and then the transaction is expired. (In the case the customer is required to reactivate the transaction through call center).
+====================================================================================================================================
+added with :
+1-adding new data field to bank table, MaximumDailyCount (int) (default value is 5)
+2- modify bankatmview to include MaximumDailyCount field
+3- portal application to be modified to enable MaximumDailyCount  data handling
+

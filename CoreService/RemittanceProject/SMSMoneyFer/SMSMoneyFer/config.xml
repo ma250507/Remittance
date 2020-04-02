@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <Listener>
+    <!-- Service will listen on that port -->
+    <LocalPort>1009</LocalPort>
+    <ClientTimeOut>50</ClientTimeOut>
+    <MaxConnections>10</MaxConnections>
+    <LogPath>c:\NCRMoneyFer_log\</LogPath>
+    <CheckATMIPMatch>0</CheckATMIPMatch>
+  </Listener>
+  
+  <Database>
+    <DataSource>.</DataSource>
+    <InitialCatalog>SMSMoneyFer</InitialCatalog>
+    <IntegratedSecurity>false</IntegratedSecurity>
+    <UserId>SMSUser</UserId>
+    <password>FAGDCGHWXIBYHZVHWJFGUJHXCFHHCAFD</password>
+  </Database>
+  <BusinessRules>
+    <ATMIdLength>5</ATMIdLength>
+    <BankIdLength>5</BankIdLength>
+    <CountryCodeLength>10</CountryCodeLength>
+    <LocalCountry>20</LocalCountry>
+    <LocalBank>TUB</LocalBank>
+    <DepositTransactionExpirationCheckPeriodMinutes>10</DepositTransactionExpirationCheckPeriodMinutes>
+    <HostOffLineStartTime>18:00:00</HostOffLineStartTime>
+    <HostOffLineEndTime>19:00:00</HostOffLineEndTime>
+    <CheckForUncertainWithdrawalFlag>1</CheckForUncertainWithdrawalFlag>
+    <UnCertainActionReason>UnCertain</UnCertainActionReason>
+    <DepositorMustRegister>1</DepositorMustRegister>
+    <BeneficiaryMustRegister>1</BeneficiaryMustRegister>
+    <!-- Check Beneficiary Registration during deposit phase 1 -->
+    <!-- Check Beneficiary Registration during withdrawal phase 2 -->
+    <WhenCheckBeneficiaryRegisteration>1</WhenCheckBeneficiaryRegisteration>
+    <UseBeneficiaryAsId>1</UseBeneficiaryAsId>
+    <UseAmountAsDPIN>0</UseAmountAsDPIN>
+    <ApplyLimitsOnBeneficiary>0</ApplyLimitsOnBeneficiary>
+	  <checkAmount>0</checkAmount>
+	  <LowestDenom>5</LowestDenom>
+  </BusinessRules>
+  <CardBased>
+    <SwitchIP>10.40.12.23</SwitchIP>
+    <SwitchPort>4466</SwitchPort>
+    <ISOHeader>ISO005000000</ISOHeader>
+    <ISORequestId>0200</ISORequestId>
+    <ProcessingCode>011000</ProcessingCode>
+    <DataElement18>5999</DataElement18>
+    <DataElement32>81800627220</DataElement32>
+    <DataElement41>BM04320520      </DataElement41>
+    <SwitchTimeOut>30</SwitchTimeOut>
+    <ChipOrMagneticIndicatorIndexInTrack2>5</ChipOrMagneticIndicatorIndexInTrack2>
+    <MagneticIndicatorIndicatorValue>1</MagneticIndicatorIndicatorValue>
+    <DataElement22>050</DataElement22>
+  </CardBased>
+</Config>

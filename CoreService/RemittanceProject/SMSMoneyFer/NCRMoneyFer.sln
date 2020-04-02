@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NCRMoneyFer", "SMSMoneyFer\NCRMoneyFer.vbproj", "{EA58B177-59A5-477C-AA6F-E7010B270DAF}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NCRCrypto", "NCRCrypto\NCRCrypto.vbproj", "{6BB831CB-6220-4B68-99F8-2D4E08D7765A}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Encrypt", "Encrypt\Encrypt.vbproj", "{5FBF5C25-FDCD-47B5-8B37-EE5CACF34F31}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6BB831CB-6220-4B68-99F8-2D4E08D7765A} = {6BB831CB-6220-4B68-99F8-2D4E08D7765A}
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "test", "test\test.vbproj", "{50239BD9-65F5-4347-A6AF-DF852EFF91CA}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NCRMoneyFerCustomerAlertService", "NCRMoneyFerCustomerAlertService\CustomerAlertService\NCRMoneyFerCustomerAlertService.vbproj", "{5638B380-F731-473C-ADDE-68C6367102AB}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "testSMSGateway_WS", "testSMSGateway_WS\testSMSGateway_WS.vbproj", "{C1466523-4028-416C-9099-49951FA1C213}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NCRHostService", "NCRHostService\NCRHostService.vbproj", "{A14E310C-853F-4821-9B14-CE890964893E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA58B177-59A5-477C-AA6F-E7010B270DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA58B177-59A5-477C-AA6F-E7010B270DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA58B177-59A5-477C-AA6F-E7010B270DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA58B177-59A5-477C-AA6F-E7010B270DAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BB831CB-6220-4B68-99F8-2D4E08D7765A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BB831CB-6220-4B68-99F8-2D4E08D7765A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BB831CB-6220-4B68-99F8-2D4E08D7765A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BB831CB-6220-4B68-99F8-2D4E08D7765A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FBF5C25-FDCD-47B5-8B37-EE5CACF34F31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FBF5C25-FDCD-47B5-8B37-EE5CACF34F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FBF5C25-FDCD-47B5-8B37-EE5CACF34F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FBF5C25-FDCD-47B5-8B37-EE5CACF34F31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50239BD9-65F5-4347-A6AF-DF852EFF91CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50239BD9-65F5-4347-A6AF-DF852EFF91CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50239BD9-65F5-4347-A6AF-DF852EFF91CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50239BD9-65F5-4347-A6AF-DF852EFF91CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5638B380-F731-473C-ADDE-68C6367102AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5638B380-F731-473C-ADDE-68C6367102AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5638B380-F731-473C-ADDE-68C6367102AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5638B380-F731-473C-ADDE-68C6367102AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1466523-4028-416C-9099-49951FA1C213}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1466523-4028-416C-9099-49951FA1C213}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1466523-4028-416C-9099-49951FA1C213}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1466523-4028-416C-9099-49951FA1C213}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A14E310C-853F-4821-9B14-CE890964893E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14E310C-853F-4821-9B14-CE890964893E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14E310C-853F-4821-9B14-CE890964893E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A14E310C-853F-4821-9B14-CE890964893E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

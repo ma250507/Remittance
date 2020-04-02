@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <CustomerAlert>
+    <ClientCheckPointInterval>5</ClientCheckPointInterval>
+    <ServiceId>CustAlert</ServiceId>
+    <BankArabicName>بنك الأهلى</BankArabicName>
+	  <BankName>Bank AHLI</BankName>
+    <LogLevel>3</LogLevel>
+    <!-- SMS Alerting Service 1= SMSModem, 2= UB SMS Service, 3= NBE SMS Web Service 4= CIB SMS Service 5= BM SMS Service 6= UNIBANK SMS Service-->
+    <SMSAlertingService>6</SMSAlertingService>
+    <EnableSendingKey2>0</EnableSendingKey2>
+   </CustomerAlert>
+  <SMSModem>
+    <SMSModemPortNumber>5</SMSModemPortNumber>
+  </SMSModem>
+  <SMSService>
+    <BasicURL>http://10.20.200.86/asm%20web%20service%20iis/sendsms.asmx</BasicURL>
+    <Provider>unitedbank</Provider>
+    <SenderMobile>0194636017</SenderMobile>
+    <SendingTimeOut>30</SendingTimeOut>
+    <User>admin</User>
+    <Password>admin</Password>
+    <Priority>10</Priority>
+    <!-- data betwenn two square brackets are to be replaced as follow: -->
+    <!-- DM=> EncryptedDepositorMobile, BM=> EncryptedBebeficiary Mobile,DP=> Key 2,BP=> Key1 -->
+    <!-- RP=> Redemption Key, TC=> Transaction Code CD=> ClearDepositorMobile, CB=> ClearBebeficiary Mobile-->
+	<!-- AB=> Arabic Bank Name, EB=> English Bank Name -->
+    <BeneficiaryDepositSMSBody>A Given amount was transfered to you from [DM]. You can collect it from any United Bank ATM using: Key 1: [BP] and Trx Code: [TC]. Ask the depositor for Key 2.</BeneficiaryDepositSMSBody>
+	  <ARBeneficiaryDepositSMSBody>لديك حوالة بنكية من رقم المحمول [DM]. يمكنك استلامها خلال 5 أيام بالرقم السري [BP]. كود العملية  [TC]. الرجاء التوجة الي أقرب فرع للبنك للإشراك في الخدمة أوإلي أقرب ماكينة صرف آلي تابعة للبنك التجاري الدولي لسحب المبلغ إذا كنت مشترك في الخدمة.</ARBeneficiaryDepositSMSBody>
+    <DepositorDepositSMSBody>Your amount was transfered successfuly to [BM] with Trx Code: [TC]. You must send Key 2: [DP] to the beneficiary</DepositorDepositSMSBody>
+	  <ARDepositorDepositSMSBody>تم التحويل إلى رقم المحمول [BM].الرجاء تبليغ النستفيد بالرقم السرى [DP] لإتمام عملية السحب خلال 5 أيام .كود العملية [TC].</ARDepositorDepositSMSBody>
+    <BeneficiaryWithdrawalSMSBody>You've successfully collected the amount being transfered to you from [DM], with Trx Code: [TC]</BeneficiaryWithdrawalSMSBody>
+	  <ARBeneficiaryWithdrawalSMSBody>شكرا لاستخدام خدمة  تربو كاش. تم تأكيد سحب الحوالة البنكية. كود العملية [TC]</ARBeneficiaryWithdrawalSMSBody>
+    <DepositorWithdrawalSMSBody>The Beneficiary [BM] has successfully collected your transfered amount with Trx Code: [TC]</DepositorWithdrawalSMSBody>
+	  <ARDepositorWithdrawalSMSBody>شكرا لاستخدام خدمة  تربو كاش. تم تسليم حوالتك البنكية بنجاح إلي رقم المحمول [BM]. كود العملية (TC)</ARDepositorWithdrawalSMSBody>
+    <DepositorTrxExpirationSMSBody_D>Your transfer transaction with Trx code [TC] has EXPIRED.  You can redeem your money from any United Bank ATM using this redemption key [RP]</DepositorTrxExpirationSMSBody_D>
+	  <ARDepositorTrxExpirationSMSBody_D>انتهت صلاحية حوالتك البنكية ويمكنك استرجاعها بالرقم السري [RP] من أقرب ماكينة صرف آلي تابعة للبنك التجاري الدولي. كود العملية [TC]</ARDepositorTrxExpirationSMSBody_D>
+    <DepositorTrxExpirationSMSBody_B>Your transfer transaction with Trx code [TC] has EXPIRED.</DepositorTrxExpirationSMSBody_B>
+	  <ARDepositorTrxExpirationSMSBody_B>انتهت صلاحية حوالتك البنكية بكود [TC] وتم ردها لرقم المحمول [DM].</ARDepositorTrxExpirationSMSBody_B>
+    <DepositorRedemptionSMSBody>You've successfully redeemed your expired transfer with Trx Code: [TC]</DepositorRedemptionSMSBody>
+	  <ARDepositorRedemptionSMSBody>شكرا لاستخدام خدمة  تربو كاش. تم استرداد حوالتك بنجاح. كود العملية [TC].</ARDepositorRedemptionSMSBody>
+
+
+  </SMSService>
+  <SMSWebService>
+    <URL>http://172.16.21.83/SMS/SMSService.asmx</URL>
+    <UserId></UserId>
+    <Password></Password>
+    <Channel>XCS</Channel>
+    <Mode>Purchase</Mode>
+    <MobilePrefix>+2</MobilePrefix>
+  </SMSWebService>
+  <CIB_SMS_Service>
+    <SMSServiceDatabaseServerName>10.11.0.107</SMSServiceDatabaseServerName>
+    <SMSServiceDatabaseName>SMS</SMSServiceDatabaseName>
+    <SMSServiceDatabaseUserid>SMS</SMSServiceDatabaseUserid>
+    <SMSServiceDatabasePassword>SMS</SMSServiceDatabasePassword>
+    <SMSServiceDataBaseIntegratedSecurity>False</SMSServiceDataBaseIntegratedSecurity>
+  </CIB_SMS_Service>
+
+
+  <SMSData>
+    <SMSDatabaseServerName>.</SMSDatabaseServerName>
+    <SMSDatabaseName>SMSMoneyFer</SMSDatabaseName>
+    <SMSDatabaseUserid>SMSUser</SMSDatabaseUserid>
+    <SMSDatabasePassword>SMSUser</SMSDatabasePassword>
+    <SMSDataBaseIntegratedSecurity>False</SMSDataBaseIntegratedSecurity>
+   </SMSData>
+	
+	<SMSHTTP>
+		<HTTPIP>192.168.1.1</HTTPIP>
+		<HTTPPort>8888</HTTPPort>
+		<HTTPSender>PWC</HTTPSender>
+		<HTTPUsername>Kareem</HTTPUsername>
+		<HTTPPassword>Voodoo</HTTPPassword>
+	</SMSHTTP>
+	<SMSHTTPUNIBank>
+		<URL>http://api.smsgh.com/v3/messages/send</URL>
+		<From>uniBank</From>
+		<ClientReference>12345</ClientReference>
+		<ClientID>iziwjxpf</ClientID>
+		<ClientSecret>lxtexakf</ClientSecret>
+		<RegisteredDelivery>true</RegisteredDelivery>
+	</SMSHTTPUNIBank>
+</Config>

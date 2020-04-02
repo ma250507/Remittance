@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <CustomerAlert>
+    <ClientCheckPointInterval>5</ClientCheckPointInterval>
+    <ServiceId>CustAlert</ServiceId>
+    <LogLevel>3</LogLevel>
+    <!-- SMS Alerting Service 1= SMSModem, 2= UB SMS Service, 3= NBE SMS Web Service-->
+    <SMSAlertingService>3</SMSAlertingService>
+   </CustomerAlert>
+  <SMSModem>
+    <SMSModemPortNumber>5</SMSModemPortNumber>
+  </SMSModem>
+  <SMSService>
+    <BasicURL>http://10.0.0.201/PreSMS/BulkHttp.aspx</BasicURL>
+    <Provider>unitedbank</Provider>
+    <SenderMobile>0194636017</SenderMobile>
+    <SendingTimeOut>30</SendingTimeOut>
+    <!-- data betwenn two square brackets are to be replaced as follow: -->
+    <!-- DM=> DepositorMobile, BM=> Bebeficiary Mobile,DP=> Key 2,BP=> Key1 -->
+    <!-- RP=> Redemption Key, TC=> Transaction Code -->
+    <BeneficiaryDepositSMSBody>A Given amount was transfered to you from [DM]. You can collect it from any United Bank ATM using: Key 1: [BP] and Trx Code: [TC]. Ask the depositor for Key 2.</BeneficiaryDepositSMSBody>
+    <DepositorDepositSMSBody>Your amount was transfered successfuly to [BM] with Trx Code: [TC]. You must send Key 2: [DP] to the beneficiary</DepositorDepositSMSBody>
+    <BeneficiaryWithdrawalSMSBody>You've successfully collected the amount being transfered to you from [DM], with Trx Code: [TC]</BeneficiaryWithdrawalSMSBody>
+    <DepositorWithdrawalSMSBody>The Beneficiary [BM] has successfully collected your transfered amount with Trx Code: [TC]</DepositorWithdrawalSMSBody>
+    <DepositorTrxExpirationSMSBody>Your transfer transaction with Trx code [TC] has EXPIRED.  You can redeem your money from any United Bank ATM using this redemption key [RP]</DepositorTrxExpirationSMSBody>
+    <DepositorRedemptionSMSBody>You've successfully redeemed your expired transfer with Trx Code: [TC]</DepositorRedemptionSMSBody>
+
+
+  </SMSService>
+  <SMSWebService>
+    <URL>http://172.16.21.83/SMS/SMSService.asmx</URL>
+    <UserId></UserId>
+    <Password></Password>
+    <Channel>XCS</Channel>
+    <Mode>Purchase</Mode>
+    <MobilePrefix>+2</MobilePrefix>
+  </SMSWebService>
+  
+  <SMSData>
+    <SMSDatabaseServerName>.</SMSDatabaseServerName>
+    <SMSDatabaseName>SMSMoneyFer</SMSDatabaseName>
+    <SMSDatabaseUserid>SMSUser</SMSDatabaseUserid>
+    <SMSDatabasePassword>SMSUser</SMSDatabasePassword>
+   </SMSData>
+  
+</Config>

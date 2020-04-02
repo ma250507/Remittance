@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="MyTable">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Action" type="xs:string" minOccurs="0" />
+              <xs:element name="ActionDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ActionReason" type="xs:string" minOccurs="0" />
+              <xs:element name="ActionStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="DispensedNotes" type="xs:string" minOccurs="0" />
+              <xs:element name="DispensedAmount" type="xs:int" minOccurs="0" />
+              <xs:element name="CommissionAmount" type="xs:string" minOccurs="0" />
+              <xs:element name="Cassette1" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette2" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette3" type="xs:int" minOccurs="0" />
+              <xs:element name="Cassette4" type="xs:int" minOccurs="0" />
+              <xs:element name="CommissionValue" type="xs:int" minOccurs="0" />
+              <xs:element name="CommissionPercent" type="xs:int" minOccurs="0" />
+              <xs:element name="RecordSeq" type="xs:int" minOccurs="0" />
+              <xs:element name="TransactionCode" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

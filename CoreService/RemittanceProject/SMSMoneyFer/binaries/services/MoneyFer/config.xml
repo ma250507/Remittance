@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <Listener>
+    <!-- Service will listen on that port -->
+    <LocalPort>1009</LocalPort>
+    <ClientTimeOut>50</ClientTimeOut>
+    <MaxConnections>10</MaxConnections>
+    <LogPath>c:\NCRMoneyFer_log\</LogPath>
+    <CheckATMIPMatch>0</CheckATMIPMatch>
+  </Listener>
+  
+  <Database>
+    <DataSource>.</DataSource>
+    <InitialCatalog>SMSMoneyFer</InitialCatalog>
+    <IntegratedSecurity>false</IntegratedSecurity>
+    <UserId>SMSUser</UserId>
+    <password>FAGDCGHWXIBYHZVHWJFGUJHXCFHHCAFD</password>
+  </Database>
+  <BusinessRules>
+    <DepositTransactionExpirationDays>2</DepositTransactionExpirationDays>
+    <DepositTransactionExpirationCheckPeriodMinutes>10</DepositTransactionExpirationCheckPeriodMinutes>
+    
+  </BusinessRules>
+
+</Config>

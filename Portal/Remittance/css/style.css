@@ -1,0 +1,366 @@
+body
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #464646;
+	text-decoration: none;
+	background-color: #BBBBBB;
+	margin: 0;
+	padding: 18px;
+}
+/*body
+{
+	margin: 0;
+	padding: 0;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #464646;
+	background-image: url(  'file:///F:/Documents and Settings/MyWorkShop/My Documents/Visual Studio 2008/WebSites/Remittance/Images/Body.jpg' );
+	background-repeat: repeat;
+	background-color: #808080;
+}*/
+#main {
+	width:1100px;
+	margin:auto;
+}
+#main-inner
+{
+	/*margin:0 21px 16px 21px;*/
+	padding: 0 17px 27px 27px;
+	min-height: 200px;
+	background-color: #FFFFFF;
+	background-image: url(   '../Images/bg-main-bottom.jpg' );
+	background-repeat: no-repeat;
+	background-position: center bottom;
+}
+#main-inner-left {
+	width: 600px;
+	display:block;
+	float:left;
+	line-height:18px;
+}
+#main-inner-right {
+	width: 300px;
+	display:block;
+	float:right;
+	border-left:1px solid #C8C8C8;
+	text-align:left;
+
+}
+#main-inner-right p {
+	color:#164365;
+	font-weight:bold;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	padding-right:7px;
+}
+#logo
+{
+	width: 1100px;
+	height: 97px;
+	background-color: #FFFFFF;
+	background-image: url(  '../images/bg-logo-top.jpg' );
+	background-repeat: no-repeat;
+	background-position: center top;
+	border-bottom: 1px solid #C8C8C8;
+}
+#Logo-img
+{
+	float:right;
+}
+#mainphoto
+{
+	height: 170px;
+	background-color: #FFFFFF;
+	border-bottom: 1px solid #C8C8C8;
+	padding: 3px 0 3px 0;
+	background-image: url( 'file:///F:/Documents and Settings/MyWorkShop/My Documents/Visual Studio 2008/WebSites/Remittance/../Images/home.jpg' );
+}
+h1, h2, h3, h4, h5, h6 { margin: 15px 0; }
+p, ul, ol { margin: 15px 0; }
+
+div#navbar {
+	width: 520px;
+	display:block;
+	float:left;
+	text-align:left;
+	padding-top:65px;
+}
+div#navbar ul {
+	margin: 0px;
+	padding: 0px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #6F6F6F;
+	white-space: nowrap;
+	font-weight: bold;
+}
+div#navbar li {
+	list-style-type: none;
+	display: inline;
+}
+div#navbar li a {
+	text-decoration: none;
+	padding: 0 3px 0 0;
+	color: #5288B3;
+	display:block;
+	float:left;
+	width:81px;
+	height:22px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	background-image: url(../images/bg-button.gif);
+	background-repeat: no-repeat;
+	text-align:center;
+	line-height:22px;
+}
+div#navbar li a:link {
+	color: #5288B3;
+}
+div#navbar li a:visited {
+	color: #5288B3;
+}
+div#navbar li a:hover {
+	color: #6F6F6F;
+	text-decoration:underline;
+}
+.clear {
+	clear:both;
+}
+#footer {
+	clear:both;
+	font-size: 10px;
+	color:#FFFFFF;
+	text-align:center;
+	padding:12px;
+	line-height:18px;
+}
+#footer a:link, #footer a:visited {
+	color:#FFFFFF;
+	text-decoration:none;
+}
+#footer a:hover {
+	color:#FFFFFF;
+	text-decoration:underline;
+}
+.highlight {
+	color:#164365;
+	text-decoration:none;
+	font-size:11px;
+	font-weight:bold;
+}
+.highlight a, .highlight a:visited {
+	color:#164365;
+	text-decoration:none;
+	text-indent:20px;
+}
+.highlight a:hover {
+	color:#6F6F6F;
+	text-decoration:underline;
+	text-indent:20px;
+}
+a, a:visited {
+	color:#164365;
+	text-decoration:underline;
+}
+a:hover {
+	color:#6F6F6F;
+	text-decoration:none;
+}
+h1 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	color: #164365;
+	font-weight:bold;
+}
+
+/*============================*/
+/*=== Custom Slider Styles ===*/
+/*============================*/
+#slider-wrapper {
+    background:url(images/slider.png) no-repeat;
+    width:1100px;
+    height:170px;
+    margin:0 auto;
+
+}
+
+#slider {
+	position:relative;
+    width:1100px;
+    height:170px;
+    margin-left:0px;
+	background:url(images/loading.gif) no-repeat 50% 50%;
+	top: 0px;
+}
+#slider img {
+	position:absolute;
+	top:0px;
+	left:0px;
+	display:none;
+}
+#slider a {
+	border:0;
+	display:block;
+}
+
+.nivo-controlNav {
+	position:absolute;
+	left:260px;
+	bottom:-42px;
+}
+.nivo-controlNav a {
+	display:block;
+	width:22px;
+	height:22px;
+	background:url(images/bullets.png) no-repeat;
+	text-indent:-9999px;
+	border:0;
+	margin-right:3px;
+	float:left;
+}
+.nivo-controlNav a.active {
+	background-position:0 -22px;
+}
+
+.nivo-directionNav a {
+	display:block;
+	width:30px;
+	height:30px;
+	background:url(images/arrows.png) no-repeat;
+	text-indent:-9999px;
+	border:0;
+}
+a.nivo-nextNav {
+	background-position:-30px 0;
+	right:15px;
+}
+a.nivo-prevNav {
+	left:15px;
+}
+
+.nivo-caption {
+    text-decoration : none;
+    font-family: Helvetica, Arial, sans-serif;
+}
+.nivo-caption a { 
+    color:#efe9d1;
+    text-decoration:underline;
+}
+/* Calendar */
+
+#calendar {
+}
+
+#calendar_wrap {
+	padding: 20px;
+}
+
+#calendar table {
+	width: 100%;
+}
+
+#calendar tbody td {
+	text-align: center;
+}
+
+#calendar #next {
+	text-align: right;
+}
+
+*GridViewCSS*
+.GridViewStyle
+{
+    font-family: Arial, Sans-Serif;
+    font-size:small;
+    table-layout: auto;
+    border-collapse: collapse;
+    border: #1d1d1d 5px solid;
+}
+/*Header and Pager styles*/
+.HeaderStyle, .PagerStyle
+{
+	background-image: url(  '../Images/HeaderGlassBlack.jpg' );
+	background-position: center;
+	background-repeat: repeat-x;
+	background-color: #1d1d1d;
+}
+.HeaderStyle th
+{
+    padding: 5px;
+    color: #ffffff;
+}
+.HeaderStyle a
+{
+    text-decoration:none;
+    color:#ffffff;
+    display:block;
+    text-align:left;
+    font-weight:normal;
+}
+.PagerStyle table
+{
+    text-align:center;
+    margin:auto;
+}
+.PagerStyle table td
+{
+    border:0px;
+    padding:5px;
+}
+.PagerStyle td
+{
+    border-top: #1d1d1d 3px solid;
+}
+.PagerStyle a
+{
+    color:#ffffff;
+    text-decoration:none;
+    padding:2px 10px 2px 10px;
+    border-top:solid 1px #777777;
+    border-right:solid 1px #333333;
+    border-bottom:solid 1px #333333;
+    border-left:solid 1px #777777;
+}
+.PagerStyle span
+{
+    font-weight:bold;
+    color:#FFFFFF;
+    text-decoration:none;
+    padding:2px 10px 2px 10px;
+}
+/*RowStyles*/
+.RowStyle td, .AltRowStyle td, .SelectedRowStyle td, .EditRowStyle td /*Common Styles*/
+{
+    padding: 5px;
+    border-right: solid 1px #1d1d1d;
+}
+.RowStyle td
+{
+    background-color: #c9c9c9;
+}
+.AltRowStyle td
+{
+    background-color: #f0f0f0;
+}
+.SelectedRowStyle td
+{
+	background-color: #B4D3FB;
+}
+.ResendCB
+{
+	display:none   ;
+}
+.TxtBox
+{
+	background-color: #E0DFE3;
+	margin-left: 0px;
+}
+.Btn_Right
+{
+	float:right;
+}
+.Over
+{
+	overflow: scroll;
+}

@@ -1,0 +1,272 @@
+﻿Imports System.Data.SqlClient
+Imports System.Data
+Partial Class Users
+    Inherits System.Web.UI.Page
+    Private NcrCrypt As NCRCrypto
+    Private UserPerm As Permissions
+    Private Con As New SqlConnection(ConfigurationManager.ConnectionStrings("NCRMoneyFerConnection").ConnectionString)
+    Private dr As SqlDataReader
+    Private Com As SqlCommand
+
+    Protected Sub Add_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim ID As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_UserId"), TextBox)).Text
+        Dim Name As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_UserName"), TextBox)).Text
+        Dim Password As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_Password"), TextBox)).Text
+        Dim GroupID As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_GroupId"), TextBox)).Text
+        Dim ATMID As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_ATMID"), TextBox)).Text
+        Dim Countrycode As String = (DirectCast(GridView3.FooterRow.FindControl("drpd_CountryCode"), DropDownList)).SelectedValue
+        Dim BankCode As String = (DirectCast(GridView3.FooterRow.FindControl("drpd_BankCode"), DropDownList)).SelectedValue
+        Dim IP As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_IPAddress"), TextBox)).Text
+        Dim Teller As CheckBox = (DirectCast(GridView3.FooterRow.FindControl("CB_IsTeller"), CheckBox))
+        Com = New SqlCommand
+        Dim myTrans As SqlTransaction
+        Dim TellerCheck As String
+
+        Dim intTeller As Integer
+        If (Teller.Checked) Then
+            intTeller = 1
+        Else
+            intTeller = 0
+        End If
+        Try
+            Con.Open()
+            Com.Connection = Con
+            Com.CommandText = "select teller from groups where id='" & GroupID & "'"
+            dr = Com.ExecuteReader()
+            While (dr.Read())
+                TellerCheck = dr(0).ToString()
+            End While
+            dr.Close()
+            Con.Close()
+        Catch ex As Exception
+            Lbl_Status.Text = "Unable to open the connection or DB Error."
+            Lbl_Status.Visible = True
+        End Try
+
+        Try
+            Con.Open()
+            myTrans = Con.BeginTransaction(IsolationLevel.ReadCommitted, "SampleTransaction")
+            Com.Connection = Con
+            Com.Transaction = myTrans
+        Catch ex As Exception
+            Lbl_Status.Text = "Unable to open the connection or to begin the transaction."
+            Lbl_Status.Visible = True
+        End Try
+
+        Dim ret As Integer = 0
+
+        NcrCrypt = New NCRCrypto()
+        If (ID = "" Or ID = Nothing Or Password = "" Or Password = Nothing) Then
+            Lbl_Status.Visible = True
+            Lbl_Status.Text = "Can`t insert empty fields"
+            Return
+        End If
+
+        Try
+            If (TellerCheck = "True") Then
+                Com.CommandText = "Insert into ATM  VALUES ('" & ATMID & "', '','" & Countrycode & "','" & BankCode & "','200','100','50','20','" & IP & "','" & intTeller & "')"
+                Com.ExecuteNonQuery()
+                Com.CommandText = "Insert into users VALUES ('" & ID & "', '" & Name & "','" & NcrCrypt.eT3_Encrypt(Password) & "','" & GroupID & "','" & ATMID & "','" & Countrycode & "','" & BankCode & "')"
+                Com.ExecuteNonQuery()
+            Else
+                Com.CommandText = "Insert into users VALUES ('" & ID & "', '" & Name & "','" & NcrCrypt.eT3_Encrypt(Password) & "','" & GroupID & "','','','')"
+                Com.ExecuteNonQuery()
+            End If
+            
+            myTrans.Commit()
+
+            Lbl_Status.Text = "DONE"
+            Lbl_Status.Visible = True
+            GridView3.DataBind()
+        Catch myex As Exception
+            Try
+                myTrans.Rollback("SampleTransaction")
+            Catch ex As SqlException
+                If Not myTrans.Connection Is Nothing Then
+                    Lbl_Status.Text = "An exception of type " & ex.GetType().ToString() & _
+                                       " was encountered while attempting to roll back the transaction."
+                    Lbl_Status.Visible = True
+                End If
+            End Try
+
+            Lbl_Status.Text = "An exception of type " & myex.GetType().ToString() & " was encountered while inserting the data, No record was written to database."
+            Lbl_Status.Visible = True
+        Finally
+            Con.Close()
+        End Try
+
+
+
+
+        'SqlDataSource1.InsertParameters("UserId").DefaultValue = ID
+        'SqlDataSource1.InsertParameters("UserName").DefaultValue = Name
+        'SqlDataSource1.InsertParameters("Password").DefaultValue = NcrCrypt.eT3_Encrypt(Password)
+        'SqlDataSource1.InsertParameters("Group_ID").DefaultValue = GroupID
+        'SqlDataSource1.InsertParameters("ATM_ID").DefaultValue = ATMID
+        'SqlDataSource1.InsertParameters("CountryCode").DefaultValue = Countrycode
+        'SqlDataSource1.InsertParameters("BankCode").DefaultValue = BankCode
+        'Try
+
+        '    SqlDataSource1.Insert()
+        'Catch ex As Exception
+        '    Lbl_Status.Visible = True
+        '    Lbl_Status.Text = "Error while adding user: " & ex.Message & ""
+        'End Try
+
+
+        'Try
+        '    Com.CommandText = "insert into atm values('" & ATMID & "','" & ID & "','" & NcrCrypt.eT3_Encrypt(Password) & "')"
+        '    Con.Open()
+        '    ret = Com.ExecuteNonQuery()
+
+        '    If (ret <> 1) Then
+        '        Lbl_Status.Visible = True
+        '        Lbl_Status.Text = "Error while adding user."
+        '        Return
+        '    End If
+        'Catch ex As Exception
+        '    Lbl_Status.Visible = True
+        '    Lbl_Status.Text = "Error while adding user: " & ex.Message & ""
+        'End Try
+
+    End Sub
+
+    Protected Sub GridView3_RowUpdating(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewUpdateEventArgs) Handles GridView3.RowUpdating
+        Dim ID As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("Label1"), Label)).Text
+        Dim Name As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("TextBox7"), TextBox)).Text
+        Dim Password As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("TextBox6"), TextBox)).Text
+        Dim GroupID As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("TextBox5"), TextBox)).Text
+        Dim IP As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("TextBox1"), TextBox)).Text
+        Dim Teller As CheckBox = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("CheckBox1"), CheckBox))
+        Dim ATMID As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("Label9"), Label)).Text
+
+        Dim intTeller As Integer
+        If (Teller.Checked) Then
+            intTeller = 1
+        Else
+            intTeller = 0
+        End If
+
+
+        SqlDataSource1.UpdateCommand = "BEGIN TRANSACTION " & _
+                                       "UPDATE [Users] SET [UserName] = @Name , [Password] = @Password, [Group_ID] = @Group_ID " & _
+                                       "WHERE [UserId] = @original_UserId " & _
+                                         "IF @@ERROR != 0 " & _
+                                            "BEGIN " & _
+                                            "ROLLBACK TRANSACTION " & _
+                                            "Return " & _
+                                            "End " & _
+                                            "Else " & _
+                                       "UPDATE atm SET ATMIPaddress = @IP, IsTeller=@Teller " & _
+                                       "WHERE [ATMID] = @ATM_ID " & _
+                                         "IF @@ERROR != 0 " & _
+                                            "BEGIN " & _
+                                            "ROLLBACK TRANSACTION " & _
+                                            "Return " & _
+                                            "End " & _
+                                                "Else " & _
+                                                    "COMMIT TRANSACTION " & _
+                                                    "GO"
+
+        SqlDataSource1.UpdateParameters.Add("Name", Name)
+        SqlDataSource1.UpdateParameters.Add("Password", Password)
+        SqlDataSource1.UpdateParameters.Add("Group_ID", GroupID)
+        SqlDataSource1.UpdateParameters.Add("original_UserId", ID)
+        SqlDataSource1.UpdateParameters.Add("IP", IP)
+        SqlDataSource1.UpdateParameters.Add("Teller", intTeller)
+        SqlDataSource1.UpdateParameters.Add("ATM_ID", ATMID)
+
+
+
+
+        Try
+            SqlDataSource1.Update()
+        Catch ex As Exception
+            Lbl_Status.Visible = True
+            Lbl_Status.Text = "Error while Updating user: " & ex.Message & ""
+        End Try
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        If (IsPostBack <> True) Then
+            Try
+                UserPerm = New Permissions()
+                UserPerm = Session("Perm")
+                If (UserPerm.Users <> "True") Then
+                    Response.Redirect("Login.aspx")
+                End If
+            Catch ex As Exception
+                Response.Redirect("Login.aspx")
+            End Try
+        Else
+            Lbl_Status.Visible = False
+            'GridView1.DataBind()
+        End If
+        
+    End Sub
+
+
+
+    Protected Sub GridView3_RowDeleting(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewDeleteEventArgs) Handles GridView3.RowDeleting
+        Dim ID As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("Label8"), Label)).Text
+        Dim ATMID As String = (DirectCast(GridView3.Rows(e.RowIndex).FindControl("Label4"), Label)).Text
+
+        SqlDataSource1.DeleteCommand = "BEGIN TRANSACTION OuterTran " & _
+                                       "DELETE FROM users WHERE userid=@UserId " & _
+                                       "DELETE FROM atm WHERE atmid=@AtmId " & _
+                                       "COMMIT TRANSACTION OuterTran "
+
+        SqlDataSource1.DeleteParameters.Add("UserId", ID)
+        SqlDataSource1.DeleteParameters.Add("AtmId", ATMID)
+
+        SqlDataSource1.Delete()
+    End Sub
+    Protected Function ManageNull(ByVal val As Object) As Boolean
+        If (IsDBNull(val)) Then
+            Return False
+        Else
+            Dim tt As Boolean = val
+            If (tt) Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End If
+    End Function
+
+    Protected Sub TXT_GroupId_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim GroupID As String = (DirectCast(GridView3.FooterRow.FindControl("TXT_GroupId"), TextBox)).Text
+        Dim TellerCheck As String
+
+        Try
+            Com = New SqlCommand
+            Con.Open()
+            Com.Connection = Con
+            Com.CommandText = "select teller from groups where id='" & GroupID & "'"
+            dr = Com.ExecuteReader()
+            While (dr.Read())
+                TellerCheck = dr(0).ToString()
+            End While
+            dr.Close()
+            Con.Close()
+        Catch ex As Exception
+            Lbl_Status.Text = "Unable to open the connection or DB Error."
+            Lbl_Status.Visible = True
+        End Try
+
+        If (TellerCheck = "True") Then
+            GridView3.Columns(6).Visible = True
+            GridView3.Columns(7).Visible = True
+            GridView3.Columns(8).Visible = True
+            GridView3.Columns(9).Visible = True
+            GridView3.Columns(10).Visible = True
+        Else
+            GridView3.Columns(6).Visible = False
+            GridView3.Columns(7).Visible = False
+            GridView3.Columns(8).Visible = False
+            GridView3.Columns(9).Visible = False
+            GridView3.Columns(10).Visible = False
+        End If
+    End Sub
+End Class
