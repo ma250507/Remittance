@@ -89,19 +89,17 @@ Public Class NCRMoneyFerService
             log.loglog("NCRMoneyFer, On Start, starting CheckLicense service error:" & ex.ToString(), True)
         End Try
 
-        ''Try
+        Try
 
-        ''    mvmonitor = New Monitor
-        ''    newThreadStartHC = New ThreadStart(AddressOf mvmonitor.doMonitor)
-        ''    newThreadHC = New Thread(newThreadStartHC)
-        ''    newThreadHC.Start()
+            mvMessage = New MessageClass
+            newThreadStartDP = New ThreadStart(AddressOf mvMessage.NewDeActivateProcess)
+            newThreadDP = New Thread(newThreadStartDP)
+            newThreadDP.Start()
 
-        ''Catch ee As Exception
-        ''    log.loglog("NCRMoneyFer, On Start, starting HostClient Monitor service error:" & ee.ToString(), "HC_Monitor", True)
+        Catch ee As Exception
+            log.loglog("NCRMoneyFer, On Start, starting DeActivate service error:" & ee.ToString(), True)
 
-        ''End Try
-
-
+        End Try
 
 
 

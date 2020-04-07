@@ -248,41 +248,78 @@ tryAgain:
             mvMessage = New MessageClass
             MessageClass.LockThread = mvLockThread
             mvMessage.ATMIPAddress = mvIPAddress.ToString
-            rtrn = mvMessage.DoRequest(IncomingDataStr)
-            If rtrn = 0 Then
-                OutGoingReply = mvMessage.GetOutgoingReplyData
-                '''''''''''''''''''Encrypt OutGoing data ''''''''''''''''''
 
-                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                OutGoingReply = Format(OutGoingReply.Length, mvLengthPartFormatter) & OutGoingReply
-                log.loglog("Reply data:[" & OutGoingReply & "]", False)
-               
-                Try
-                    OutGoingReplyArray = Encoding.ASCII.GetBytes(OutGoingReply)
-                    mvSocket.Send(OutGoingReplyArray)
-                Catch exs As Exception
-                    log.loglog("sending Reply Error:" & exs.Message, False)
-                End Try
+            Dim fs = Chr(28)
+            If Not (IncomingDataStr.Contains(fs.ToString())) Then
+                rtrn = mvMessage.DoRequest(IncomingDataStr)
+                If rtrn = 0 Then
+                    OutGoingReply = mvMessage.GetOutgoingReplyData
+                    '''''''''''''''''''Encrypt OutGoing data ''''''''''''''''''
+
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    OutGoingReply = Format(OutGoingReply.Length, mvLengthPartFormatter) & OutGoingReply
+                    log.loglog("Reply data:[" & OutGoingReply & "]", False)
+
+                    Try
+                        OutGoingReplyArray = Encoding.ASCII.GetBytes(OutGoingReply)
+                        mvSocket.Send(OutGoingReplyArray)
+                    Catch exs As Exception
+                        log.loglog("sending Reply Error:" & exs.Message, False)
+                    End Try
+                Else
+                    OutGoingReply = Space(20) & "00" & Format(rtrn, "00000")
+                    '''''''''''''''''''Encrypt OutGoing data ''''''''''''''''''
+
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    OutGoingReply = Format(OutGoingReply.Length, mvLengthPartFormatter) & OutGoingReply
+                    log.loglog("Error,Reply data:[" & OutGoingReply & "]", False)
+                    Try
+                        OutGoingReplyArray = Encoding.ASCII.GetBytes(OutGoingReply)
+                        mvSocket.Send(OutGoingReplyArray)
+                    Catch exs As Exception
+                        log.loglog("sending Reply Error:" & exs.Message, False)
+                    End Try
+
+                End If
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
             Else
-                OutGoingReply = Space(20) & "00" & Format(rtrn, "00000")
-                '''''''''''''''''''Encrypt OutGoing data ''''''''''''''''''
+                rtrn = mvMessage.DoRequestNew(IncomingDataStr)
+                'If rtrn = 0 Then
 
-                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                OutGoingReply = Format(OutGoingReply.Length, mvLengthPartFormatter) & OutGoingReply
-                log.loglog("Error,Reply data:[" & OutGoingReply & "]", False)
-                Try
-                    OutGoingReplyArray = Encoding.ASCII.GetBytes(OutGoingReply)
-                    mvSocket.Send(OutGoingReplyArray)
-                Catch exs As Exception
-                    log.loglog("sending Reply Error:" & exs.Message, False)
-                End Try
+                OutGoingReply = mvMessage.GetOutgoingNewReplyData
+                    '''''''''''''''''''Encrypt OutGoing data ''''''''''''''''''
+
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    OutGoingReply = Format(OutGoingReply.Length, mvLengthPartFormatter) & OutGoingReply
+                    log.loglog("Reply data:[" & OutGoingReply & "]", False)
+
+                    Try
+                        OutGoingReplyArray = Encoding.ASCII.GetBytes(OutGoingReply)
+                        mvSocket.Send(OutGoingReplyArray)
+                    Catch exs As Exception
+                        log.loglog("sending Reply Error:" & exs.Message, False)
+                    End Try
+                'Else
+                '    OutGoingReply = Space(20) & "00" & Format(rtrn, "00000")
+                '    '''''''''''''''''''Encrypt OutGoing data ''''''''''''''''''
+
+                '    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                '    OutGoingReply = Format(OutGoingReply.Length, mvLengthPartFormatter) & OutGoingReply
+                '    log.loglog("Error,Reply data:[" & OutGoingReply & "]", False)
+                '    Try
+                '        OutGoingReplyArray = Encoding.ASCII.GetBytes(OutGoingReply)
+                '        mvSocket.Send(OutGoingReplyArray)
+                '    Catch exs As Exception
+                '        log.loglog("sending Reply Error:" & exs.Message, False)
+                '    End Try
+
+                'End If
 
             End If
-            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
             Thread.Sleep(100)
