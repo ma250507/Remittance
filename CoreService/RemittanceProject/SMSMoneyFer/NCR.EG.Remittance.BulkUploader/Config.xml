@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <NCRConfiguration>
+    <BankCode>NCR</BankCode>
+    <LicenseName>xxxx.lic</LicenseName>
+    <DebugMode>1</DebugMode>
+    <LogPath>C:\NCR_LOGS\</LogPath>
+  </NCRConfiguration>
+  <Email>
+    <SendEmail>0</SendEmail>
+    <SmtpServer>microsoft.outlook.com</SmtpServer>
+    <SmtpUserName>mk</SmtpUserName>
+    <SmtpUserPass>ps</SmtpUserPass>
+    <smtpPort>4040</smtpPort>
+    <FromMail>mail@from.com</FromMail>
+    <EnableSSL>1</EnableSSL>
+    <UseDefaultCredentials>1</UseDefaultCredentials>
+    <BankCode></BankCode>
+    <SendEmailTo>mail@delivery.com|mail2@delivery2.com</SendEmailTo>
+  </Email>
+  <Database>
+    <DataSource>.</DataSource>
+    <InitialCatalog>Fawry</InitialCatalog>
+    <IntegratedSecurity>true</IntegratedSecurity>
+    <UserId>sa</UserId>
+    <password>XIVDHEIAIBXYHUGFCGJVIBGFUDVDCZDUUBFDDGXEHUDVCBECEDBYXFHEIEVVCEXJ</password>
+  </Database>
+  <ServiceConfiguration>
+    <BulkFilePath>C:\example\</BulkFilePath>
+    <BulkFileName>fileupload</BulkFileName>
+    <OutputFilePath>C:\bulkOutput\</OutputFilePath>
+    <OutputFileName>RESULT</OutputFileName>
+    <CheckFileInterval>1</CheckFileInterval> <!-- minutes -->
+    <DataFileSeparator>;</DataFileSeparator>
+    <MinimumDataNumber>4</MinimumDataNumber>
+  </ServiceConfiguration>
+</Config>
