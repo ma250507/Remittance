@@ -61,10 +61,10 @@ Public Class MessageClass
     Const cnst_RequestType_ExpiredManuallyConfirm As String = "39"
 
 
-    Const cnst_RequestType_NewWithdrawalAuthorization As String = "N1"
-    Const cnst_RequestType_NewWithdrawalConfirmation As String = "N2"
-    Const cnst_RequestType_NewWithdrawalCancelation As String = "N3"
-    Const cnst_RequestType_NewWithdrawalUnCertain As String = "N4"
+    Const cnst_RequestType_NewWithdrawalAuthorization As String = "AUT"
+    Const cnst_RequestType_NewWithdrawalConfirmation As String = "CON"
+    Const cnst_RequestType_NewWithdrawalCancelation As String = "CAN"
+    Const cnst_RequestType_NewWithdrawalUnCertain As String = "UNC"
 
 
     Const cnst_ErrCode_MessageParsingError As Integer = 1
@@ -1162,15 +1162,13 @@ Public Class MessageClass
 
 
                 lActionCode = cnst_RequestType_WithdrawalConfirmation
-                If CONFIGClass.CheckForUncertainWithdrawalFlag = 1 Then
-                    If ActionReason.ToUpper.Contains(CONFIGClass.UnCertainActionReason.ToUpper) = True Then
-                        lActionCode = cnst_RequestType_WithdrawalUnCertain
-                    End If
-                End If
+                'If CONFIGClass.CheckForUncertainWithdrawalFlag = 1 Then
+                '    If ActionReason.ToUpper.Contains(CONFIGClass.UnCertainActionReason.ToUpper) = True Then
+                '        lActionCode = cnst_RequestType_WithdrawalUnCertain
+                '    End If
+                'End If
 
                 rtrn = lUpdateRequestNew(lActionCode)
-                BeneficiaryPIN = ""
-                DepositorPIN = ""
 
                 If rtrn <> 0 Then
                     ResponseCode = cnst_ErrCode_DataBaseError.ToString("00000")
@@ -1211,7 +1209,34 @@ Public Class MessageClass
                 ResponseCode = "00000"
                 lNewFormReply(mvOutGoingNewReplyData)
                 Return 0
+            Case cnst_RequestType_NewWithdrawalUnCertain
 
+                rtrn = isTransactionNew()
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                rtrn = lCheckPINs_Teller()
+                If rtrn <> 0 Then
+                    ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+
+                End If
+                rtrn = lUpdateRequestNew(cnst_RequestType_NewWithdrawalUnCertain)
+
+                If rtrn <> 0 Then
+
+                    ResponseCode = cnst_ErrCode_DataBaseError.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                ResponseCode = "00000"
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
             Case Else
                 ResponseCode = cnst_ErrCode_UnknownRequestType.ToString("00000")
                 lNewFormReply(mvOutGoingNewReplyData)
@@ -3184,7 +3209,7 @@ nextRow:
             Qstr = "select * from NewTransactions  "
             Qstr += " where "
             Qstr += " TransactionCode='" & Hosttransactioncode & "'"
-
+            Qstr += " and NationalID like '%" & NationalID & "'"
 
             cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
             cn.Open()
@@ -4215,13 +4240,15 @@ nextRow:
             loutGoingNewReplyData += TransactionSequence
             loutGoingNewReplyData += fs
             loutGoingNewReplyData += ResponseCode
-            loutGoingNewReplyData += fs
-            loutGoingNewReplyData += DispensedAmount
-            loutGoingNewReplyData += fs
-            loutGoingNewReplyData += CommissionAmount
-            loutGoingNewReplyData += fs
-            loutGoingNewReplyData += DispensedNotes
 
+            If RequestType = cnst_RequestType_NewWithdrawalAuthorization Then
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += DispensedAmount
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += CommissionAmount
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += DispensedNotes
+            End If
 
             Return 0
         Catch ex As Exception
