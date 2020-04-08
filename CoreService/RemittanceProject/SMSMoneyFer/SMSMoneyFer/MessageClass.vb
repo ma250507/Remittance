@@ -2580,7 +2580,7 @@ Public Class MessageClass
                     Qstr += " ,ATMDateTime= '" & ATMDateTime & "' "
                     Qstr += " ,ATMTransactionSequence= '" & TransactionSequence & "' "
                     Qstr += " ,CommissionAmount= '" & CommissionAmount & "' "
-                    Qstr += " ,CassettesDispensedNotes= '" & DispensedNotes & "' "
+                    Qstr += " ,DispensedNotes= '" & DispensedNotes & "' "
                     Qstr += " ,DispensedAmount= '" & DispensedAmount & "' "
                     Qstr += " where ( WithdrawalStatus is null or WithdrawalStatus =  '" & cnst_ActionStatus_CANCELED & "')"
                     Qstr += " and TransactionCode ='" & Hosttransactioncode & "' "
@@ -2828,11 +2828,12 @@ nextRow:
             cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
             cn.Open()
 
-            SQstr = "select * from NewTransactions "
+            SQstr = "select * from NewTransactions  t inner join Remitters r on t.RemitterID = r.ID"
             SQstr += " where ( WithdrawalStatus is null or WithdrawalStatus =  '" & cnst_ActionStatus_CANCELED & "' or WithdrawalStatus =  '" & cnst_ActionStatus_HOLD & "')"
 
-            SQstr += " And datediff(" & Chr(34) & "D" & Chr(34) & ", TransactionDateTime, getdate()) >= " & mvDeposittrxExpDays
+            SQstr += " And datediff(" & Chr(34) & "D" & Chr(34) & ", TransactionDateTime, getdate()) >= r.ExpirationDays"
 
+            log.loglog("UpdateRequestSetExpiredNew SQstr: " & SQstr, "DeActivate", True)
             da = New System.Data.SqlClient.SqlDataAdapter(SQstr, cn)
             ds = New DataSet
             da.Fill(ds)
@@ -2849,6 +2850,7 @@ nextRow:
 
                         Qstr = "update NewTransactions  set "
                         Qstr += "WithdrawalStatus='" & cnst_ActionStatus_EXPIRED & "'  "
+                        Qstr += ",WithdrawalDateTime=getdate()"
                         Qstr += " where transactioncode='" & thisTxCode & "'"
 
                         Subquery = " insert into  NewTransactionNestedActions "
@@ -3003,9 +3005,7 @@ nextRow:
         log.loglog("NewDeActivateProcess, Will Start ...", "NewDeActivateProcess", False)
         While Not ListnerClass.StopListnerFlag
             Try
-                'read configuration rules parameters  
-                GetBankInfo()
-                '''''''''''''''''''''''''''''''''''
+
                 If Now.Subtract(LastProcessingTime).TotalMinutes > CONFIGClass.DepositTransactionExpirationCheckPeriodMinutes Then
                     LastProcessingTime = Now
                     rtrn = UpdateRequestSetExpiredNew(logfNoRows)

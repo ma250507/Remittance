@@ -24,8 +24,7 @@ Module CashRemittance
                             loglog("EOD File Creation Failed For Cardless Transactions For Date = " & EODDate, True)
                             System.IO.File.Delete(FilePath)
                         End If
-                    Else
-                        Exit Sub
+
                     End If
                     If (WriteFileFlagDBT) Then
                         UpdateFlagDBT = UpdateEODData(DebitRows)
@@ -35,8 +34,7 @@ Module CashRemittance
                             loglog("EOD File Creation Failed For Debit Transactions For Date = " & EODDate, True)
                             System.IO.File.Delete(FilePath)
                         End If
-                    Else
-                        Exit Sub
+
                     End If
                     If (WriteFileFlagCRDT) Then
                         UpdateFlagCRDT = UpdateEODData(CreditRows)
@@ -46,15 +44,21 @@ Module CashRemittance
                             loglog("EOD File Creation Failed For Credit Transactions For Date = " & EODDate, True)
                             System.IO.File.Delete(FilePath)
                         End If
-                    Else
-                        Exit Sub
+
                     End If
                 End If
-            Else
-                Exit Sub
+
             End If
-        Else
-            Exit Sub
+
+            GetEODFlag = GetMoneyFerEODNewData(EODDate, DT)
+            If GetEODFlag = True Then
+                GetEODFlag = WriteEODNewFile(DT.Select())
+                If GetEODFlag = True Then
+                    UpdateEODNewData(EODDate)
+                End If
+
+            End If
+
         End If
     End Sub
 
