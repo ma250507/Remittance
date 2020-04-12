@@ -5,6 +5,7 @@
 				<Time>12:00</Time>
                 <ConnectionString>Provider=SQLOLEDB.1;Password=SMSUser;Persist Security Info=True;User ID=SMSUser;Initial Catalog=SMSMoneyFer;Data Source=172.16.46.70</ConnectionString>
 				<DepositHostFlag>1</DepositHostFlag>
+     <NewEODPath>C:\</NewEODPath>
 				<EODPath>C:\</EODPath>
 				<WithDrawalHostFlag>1</WithDrawalHostFlag>
      <DepositCode>D</DepositCode>

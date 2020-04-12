@@ -61,6 +61,12 @@ Public Class MessageClass
     Const cnst_RequestType_ExpiredManuallyConfirm As String = "39"
 
 
+    Const cnst_RequestType_NewWithdrawalAuthorization As String = "AUT"
+    Const cnst_RequestType_NewWithdrawalConfirmation As String = "CON"
+    Const cnst_RequestType_NewWithdrawalCancelation As String = "CAN"
+    Const cnst_RequestType_NewWithdrawalUnCertain As String = "UNC"
+
+
     Const cnst_ErrCode_MessageParsingError As Integer = 1
     Const cnst_ErrCode_UnknownRequestType As Integer = 2
     Const cnst_ErrCode_CanNotGetHostTrxCode As Integer = 3
@@ -79,6 +85,9 @@ Public Class MessageClass
     Const cnst_ErrCode_NoExpiredTransactionsOrDBError As Integer = 8
     Const cnst_ErrCode_ATMIPAddressNotMatchedError As Integer = 16
     Const cnst_ErrCode_ATMIPAddressIsNotTeller As Integer = 17
+
+
+
     Const cnst_ErrCode_CassettesValuesErrors As Integer = 18
     Const cnst_ErrCode_CalculateDispensedNotesError As Integer = 19
 
@@ -146,6 +155,7 @@ Public Class MessageClass
     Public ResponseCode As String '5
     Public ATMDate As String '10
     Public ATMTime As String '8
+    Public ATMDateTime As DateTime
     Public TransactionSequence As String '10
     Public DepositorMobile As String '20
     Public DepositorPIN As String '10
@@ -168,12 +178,13 @@ Public Class MessageClass
     Public ReceiptLine3 As String '40
     Public ExtraData As String '40
     Public DispensedRate As Double = 1
-
+    Public NationalID As String
 
     Public ATMIPAddress As String
 
 
     Private mvOutGoingReplyData As String
+    Private mvOutGoingNewReplyData As String
     Private mvISTeller As Boolean
     ''' shared object to ensure locking during trx code generation
     Public Shared LockThread As Threading.Thread
@@ -208,6 +219,10 @@ Public Class MessageClass
 
     Public Function GetOutgoingReplyData() As String
         Return mvOutGoingReplyData
+    End Function
+
+    Public Function GetOutgoingNewReplyData() As String
+        Return mvOutGoingNewReplyData
     End Function
     Private Function ArrangeCassettesValues() As Integer
         Dim i As Integer
@@ -251,7 +266,7 @@ Public Class MessageClass
 
         Try
             Qstr = "select * from bankatmview where "
-            Qstr = Qstr & " ATMId='" & ATMId & "' and bankcode='" & BankId & "' and countrycode='" & Country & "'"
+            Qstr = Qstr & " ATMId='" & ATMId & "' and bankcode='" & CONFIGClass.LocalBank & "' and countrycode='" & CONFIGClass.LocalCountry & "'"
 
             cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
             cn.Open()
@@ -354,6 +369,9 @@ Public Class MessageClass
         End Try
 
     End Function
+
+
+
     Private Function GetBankInfo() As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
         Dim cmd As System.Data.SqlClient.SqlCommand
@@ -711,6 +729,56 @@ Public Class MessageClass
 
     End Function
 
+    Private Function isExpiredNew(ByVal pTrxCode As String) As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim dr As System.Data.SqlClient.SqlDataReader
+        Dim Qstr As String
+        Dim rtrF As Integer
+
+        Try
+
+
+            Qstr = "select * from NewTransactions where "
+            Qstr = Qstr & " transactioncode='" & pTrxCode & "' "
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
+
+            dr = cmd.ExecuteReader()
+            If dr.HasRows = True Then
+                dr.Read()
+
+
+                Dim lWithdrawalStatus As String
+
+                If IsDBNull(dr("WithdrawalStatus")) Then
+                    lWithdrawalStatus = ""
+                Else
+                    lWithdrawalStatus = dr("WithdrawalStatus")
+                End If
+
+                If lWithdrawalStatus = cnst_ActionStatus_EXPIRED Or lWithdrawalStatus = cnst_ActionStatus_CANCELED Then
+                    rtrF = cnst_ErrCode_ExpiredTransaction
+                Else
+                    log.loglog("isExpiredNew, Error Transaction [" & pTrxCode & "] is not expired, will concider it unExpired", False)
+                    rtrF = cnst_ErrCode_NotExpiredDepositTransaction
+
+                End If
+                dr.Close()
+                cn.Close()
+                cn = Nothing
+                cmd = Nothing
+                dr = Nothing
+                Return rtrF
+            End If
+        Catch ex As Exception
+            log.loglog("isExpiredNew Error connection string:[" & CONFIGClass.ConnectionString & "] Ex:" & ex.ToString, False)
+            Return cnst_ErrCode_DataBaseError
+        End Try
+
+    End Function
 
     '' ''Function GetDispensedNotes(ByVal pAmount As Integer, ByRef pDispensedAmount As Integer, ByRef pCommissionAmount As Integer, ByRef pNotesString As String) As Integer
     '' ''    Dim lAmount As Integer
@@ -973,7 +1041,246 @@ Public Class MessageClass
 
     End Function
 
+    Public Function DoRequestNew(incomingDataStr As String) As Integer
+        Dim rtrn As Integer
+        Dim enc As New NCRCrypto.NCRCrypto
+        Dim lActionCode As String = ""
+        rtrn = lNewParseRequest(incomingDataStr)
+        If rtrn <> 0 Then
+            Return rtrn
+        End If
 
+
+        '================================= Validate ATM IP Address if required
+        If CONFIGClass.CheckATMIPMatch > 0 Then
+            rtrn = lValidateATMIPAddress(ATMId, ATMIPAddress)
+            If rtrn <> 0 Then
+                ResponseCode = cnst_ErrCode_ATMIPAddressNotMatchedError.ToString("00000")
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
+            End If
+        End If
+        '===========================================================================
+
+
+        rtrn = GetCassettesInfo()
+        If rtrn <> 0 Then
+            ResponseCode = cnst_ErrCode_CassettesValuesErrors.ToString("00000")
+            lNewFormReply(mvOutGoingNewReplyData)
+            Return 0
+        End If
+
+
+
+        Select Case RequestType
+
+
+            Case cnst_RequestType_NewWithdrawalAuthorization
+
+                rtrn = isTransactionNew()
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                rtrn = lCheckPINsNew()
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+
+                End If
+
+
+                rtrn = isExpiredNew(Hosttransactioncode)
+                If rtrn = cnst_ErrCode_ExpiredTransaction Then
+                    ResponseCode = cnst_ErrCode_ExpiredTransaction.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+
+                End If
+
+
+                'calclate Dispensed Notes Here
+
+                DispensedNotes = ""
+                DispensedAmount = 0
+                CommissionAmount = 0
+
+                rtrn = GetDispensedNotes_10(Amount, DispensedAmount, CommissionAmount, DispensedNotes)
+
+                If rtrn <> 0 Then
+                    ResponseCode = cnst_ErrCode_CalculateDispensedNotesError.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+
+                rtrn = lUpdateRequestNew(cnst_RequestType_WithdrawalAuthorization)
+
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                ResponseCode = "00000"
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
+
+
+            Case cnst_RequestType_NewWithdrawalConfirmation
+
+                rtrn = isTransactionNew()
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                rtrn = lCheckPINs_Teller()
+                If rtrn <> 0 Then
+
+                    ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+
+                End If
+
+                DispensedNotes = ""
+                DispensedAmount = 0
+                CommissionAmount = 0
+
+                rtrn = GetDispensedNotes_10(Amount, DispensedAmount, CommissionAmount, DispensedNotes)
+
+                If rtrn <> 0 Then
+                    ResponseCode = cnst_ErrCode_CalculateDispensedNotesError.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+
+                lActionCode = cnst_RequestType_WithdrawalConfirmation
+                'If CONFIGClass.CheckForUncertainWithdrawalFlag = 1 Then
+                '    If ActionReason.ToUpper.Contains(CONFIGClass.UnCertainActionReason.ToUpper) = True Then
+                '        lActionCode = cnst_RequestType_WithdrawalUnCertain
+                '    End If
+                'End If
+
+                rtrn = lUpdateRequestNew(lActionCode)
+
+                If rtrn <> 0 Then
+                    ResponseCode = cnst_ErrCode_DataBaseError.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                ResponseCode = "00000"
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
+
+
+            Case cnst_RequestType_NewWithdrawalCancelation
+
+                rtrn = isTransactionNew()
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                rtrn = lCheckPINs_Teller()
+                If rtrn <> 0 Then
+                    ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+
+                End If
+                rtrn = lUpdateRequestNew(cnst_RequestType_WithdrawalCancelation)
+
+                If rtrn <> 0 Then
+
+                    ResponseCode = cnst_ErrCode_DataBaseError.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                ResponseCode = "00000"
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
+            Case cnst_RequestType_NewWithdrawalUnCertain
+
+                rtrn = isTransactionNew()
+                If rtrn <> 0 Then
+                    ResponseCode = rtrn.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                rtrn = lCheckPINs_Teller()
+                If rtrn <> 0 Then
+                    ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+
+                End If
+                rtrn = lUpdateRequestNew(cnst_RequestType_NewWithdrawalUnCertain)
+
+                If rtrn <> 0 Then
+
+                    ResponseCode = cnst_ErrCode_DataBaseError.ToString("00000")
+                    lNewFormReply(mvOutGoingNewReplyData)
+                    Return 0
+                End If
+
+                ResponseCode = "00000"
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
+            Case Else
+                ResponseCode = cnst_ErrCode_UnknownRequestType.ToString("00000")
+                lNewFormReply(mvOutGoingNewReplyData)
+                Return 0
+        End Select
+    End Function
+
+    Private Function lNewParseRequest(lIncomingRequestData As String) As Integer
+        Dim ll As Integer
+        Dim curPos As Integer
+
+        If lIncomingRequestData.Length = 0 Then
+            log.loglog("New Parsing Request: bad request length", False)
+            Return 1
+        End If
+        Try
+            Dim FS = Chr(28)
+            Dim lIncomingRequestDataString As String() = lIncomingRequestData.Split(New Char() {FS})
+            RequestType = lIncomingRequestDataString(0)
+            log.loglog("New Parsing RequestType: " & RequestType, False)
+
+            ATMId = lIncomingRequestDataString(1)
+            log.loglog("New Parsing ATMId: " & ATMId, False)
+
+            ATMDateTime = DateTime.Parse(lIncomingRequestDataString(2))
+            log.loglog("New Parsing ATMDateTime: " & ATMDateTime, False)
+
+            TransactionSequence = lIncomingRequestDataString(3)
+            log.loglog("New Parsing TransactionSequence: " & TransactionSequence & toString(), False)
+
+            ResponseCode = lIncomingRequestDataString(4)
+            log.loglog("New Parsing ResponseCode: " & ResponseCode, False)
+
+            NationalID = lIncomingRequestDataString(5)
+            log.loglog("New Parsing NationalID: " & NationalID, False)
+
+            Return 0
+        Catch ex As Exception
+
+            log.loglog("New Parsing Request Error:" & ex.ToString, False)
+            Return (9)
+        End Try
+
+    End Function
 
     Public Function DoRequest(ByVal pIncomingRequestData As String) As Integer
         Dim rtrn As Integer
@@ -985,6 +1292,12 @@ Public Class MessageClass
         Dim tmpRPIn As String = ""
         Dim lActionCode As String = ""
         Dim tmpStr As String
+
+
+
+
+
+
         rtrn = lParseRequest(pIncomingRequestData)
         If rtrn <> 0 Then
             Return rtrn
@@ -1024,9 +1337,9 @@ Public Class MessageClass
         '=== using Amount as Depositor PIN =======================================
         If DepositorPIN = "" Then
             If CONFIGClass.UseAmountAsDPIN > 0 Then
-                If RequestType = cnst_RequestType_WithdrawalAuthorization Or _
-                     RequestType = cnst_RequestType_WithdrawalConfirmation Or _
-                     RequestType = cnst_RequestType_WithdrawalCancelation Then
+                If RequestType = cnst_RequestType_WithdrawalAuthorization Or
+                         RequestType = cnst_RequestType_WithdrawalConfirmation Or
+                         RequestType = cnst_RequestType_WithdrawalCancelation Then
                     log.loglog("DoRequest, empty DepostorPin with UseAmountAsDPIN =[" & CONFIGClass.UseAmountAsDPIN & "] will use amount [" & Amount & "] to authenticate trx", False)
                     tmpStr = ""
                     rtrn = getDPINByAmount(Amount, tmpStr)
@@ -1041,7 +1354,7 @@ Public Class MessageClass
         End If
         '========================================================================
 
-       
+
         '=== using Beneficiary Mobile instead of transacxtion code DeMO purbos
         If CONFIGClass.UseBeneficiaryAsId > 0 Then
             If RequestType = cnst_RequestType_WithdrawalAuthorization Then
@@ -1125,7 +1438,7 @@ Public Class MessageClass
                         Return 0
                     End If
                 End If
-                
+
 
                 '' end kareem Nour
                 'pre step is to check daily max amount per mobile
@@ -1736,9 +2049,9 @@ Public Class MessageClass
                 ResponseCode = "00000"
                 lFormReply(mvOutGoingReplyData)
                 Return 0
-            Case cnst_RequestType_DepositHold, _
-                             cnst_RequestType_DepositUnHold, cnst_RequestType_UnBLock, _
-                             cnst_RequestType_ManuallyConfirm, cnst_RequestType_ExpiredManuallyConfirm, cnst_RequestType_DepositForceExpiration
+            Case cnst_RequestType_DepositHold,
+                                 cnst_RequestType_DepositUnHold, cnst_RequestType_UnBLock,
+                                 cnst_RequestType_ManuallyConfirm, cnst_RequestType_ExpiredManuallyConfirm, cnst_RequestType_DepositForceExpiration
 
                 If mvISTeller = False Then
                     BeneficiaryPIN = ""
@@ -1936,6 +2249,38 @@ Public Class MessageClass
 
     End Function
 
+    Private Function lNewInsertKeyCkecTrial() As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim Qstr As String = ""
+        Dim RowsAffected As Integer
+        Try
+            Qstr = "insert into NewTransactionKeyCheckTrials (TransactionCode)"
+            Qstr = Qstr & " Values ('" & Hosttransactioncode & "')"
+
+
+
+
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
+            RowsAffected = cmd.ExecuteNonQuery()
+            If RowsAffected < 1 Then
+                log.loglog("lNewInsertKeyCkecTrial Error with Qstr=[" & Qstr & "]  no rows affected", False)
+                Return cnst_ErrCode_DataBaseError
+            End If
+            cn.Close()
+            cn = Nothing
+            cmd = Nothing
+            Return 0
+        Catch ex As Exception
+            log.loglog("lNewInsertKeyCkecTrial Error with Qstr=[" & Qstr & "]" & vbNewLine & "Ex:" & ex.ToString, False)
+            Return 9
+        End Try
+
+
+    End Function
     Private Function lUpdateRequest(ByVal pAction As String) As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
         Dim cmd As System.Data.SqlClient.SqlCommand
@@ -2216,7 +2561,95 @@ Public Class MessageClass
         End Try
 
     End Function
+    Private Function lUpdateRequestNew(ByVal pAction As String) As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim Qstr As String = ""
+        Dim RowsAffected As Integer
+        Dim Subquery As String = ""
+        Dim sqltrx As SqlClient.SqlTransaction
+        Try
+            Qstr = "update NewTransactions  set "
 
+            Select Case pAction
+
+                Case cnst_RequestType_NewWithdrawalAuthorization
+                    Qstr += " WithdrawalStatus='" & cnst_ActionStatus_AUTHORIZED & "' "
+                    Qstr += " ,WithdrawalDateTime=getdate() "
+                    Qstr += " ,ATMId= '" & ATMId & "' "
+                    Qstr += " ,ATMDateTime= '" & ATMDateTime & "' "
+                    Qstr += " ,ATMTransactionSequence= '" & TransactionSequence & "' "
+                    Qstr += " ,CommissionAmount= '" & CommissionAmount & "' "
+                    Qstr += " ,DispensedNotes= '" & DispensedNotes & "' "
+                    Qstr += " ,DispensedAmount= '" & DispensedAmount & "' "
+                    Qstr += " where ( WithdrawalStatus is null or WithdrawalStatus =  '" & cnst_ActionStatus_CANCELED & "')"
+                    Qstr += " and TransactionCode ='" & Hosttransactioncode & "' "
+                    Subquery = " Insert into NewTransactionNestedActions (TransactionCode,action,ActionDateTime,ActionReason,ActionStatus,DispensedNotes,DispensedAmount,CommissionAmount,Cassette1,Cassette2,Cassette3,Cassette4,CountryCode,BankCode,ATMId,ATMTrxSequence,DispensedCurrencyCode,DispensedRate) "
+                    Subquery += " values ('" & Hosttransactioncode & "','" & pAction & "',getdate(), '" & ActionReason & "','" & cnst_ActionStatus_AUTHORIZED & "','" & DispensedNotes & "'," & DispensedAmount & "," & CommissionAmount & "," & mvATMPhysicalCassitteValue(1) & "," & mvATMPhysicalCassitteValue(2) & "," & mvATMPhysicalCassitteValue(3) & "," & mvATMPhysicalCassitteValue(4) & ",'" & CONFIGClass.LocalCountry & "','" & CONFIGClass.LocalBank & "','" & ATMId & "','" & TransactionSequence & "','" & Currency & "'," & DispensedRate & " )"
+
+                Case cnst_RequestType_NewWithdrawalConfirmation
+                    Qstr += " WithdrawalStatus='" & cnst_ActionStatus_CONFIRMED & "' "
+                    Qstr += " ,WithdrawalDateTime= '" & ATMDateTime & "' "
+                    Qstr += " where WithdrawalStatus ='" & cnst_ActionStatus_AUTHORIZED & "' "
+                    Qstr += " and TransactionCode ='" & Hosttransactioncode & "' "
+                    Subquery = " Insert into NewTransactionNestedActions (TransactionCode,action,ActionDateTime,ActionReason,ActionStatus,DispensedNotes,DispensedAmount,CommissionAmount,Cassette1,Cassette2,Cassette3,Cassette4,CountryCode,BankCode,ATMId,ATMTrxSequence,DispensedCurrencyCode,DispensedRate) "
+                    Subquery += " values ('" & Hosttransactioncode & "','" & pAction & "',getdate(), '" & ActionReason & "','" & cnst_ActionStatus_CONFIRMED & "','" & DispensedNotes & "'," & DispensedAmount & "," & CommissionAmount & "," & mvATMPhysicalCassitteValue(1) & "," & mvATMPhysicalCassitteValue(2) & "," & mvATMPhysicalCassitteValue(3) & "," & mvATMPhysicalCassitteValue(4) & ",'" & CONFIGClass.LocalCountry & "','" & CONFIGClass.LocalBank & "','" & ATMId & "','" & TransactionSequence & "','" & Currency & "'," & DispensedRate & " )"
+                Case cnst_RequestType_NewWithdrawalUnCertain
+                    Qstr += " WithdrawalStatus='" & cnst_ActionStatus_UnCertain & "' "
+                    Qstr += " ,WithdrawalDateTime= '" & ATMDateTime & "' "
+                    Qstr += " where WithdrawalStatus ='" & cnst_ActionStatus_AUTHORIZED & "' "
+                    Qstr += " and TransactionCode ='" & Hosttransactioncode & "' "
+
+                    Subquery = " Insert into NewTransactionNestedActions (TransactionCode,action,ActionDateTime,ActionReason,ActionStatus,DispensedNotes,DispensedAmount,CommissionAmount,Cassette1,Cassette2,Cassette3,Cassette4,CountryCode,BankCode,ATMId,ATMTrxSequence,DispensedCurrencyCode,DispensedRate) "
+                    Subquery += " values ('" & Hosttransactioncode & "','" & pAction & "',getdate(), '" & ActionReason & "','" & cnst_ActionStatus_UnCertain & "','" & DispensedNotes & "'," & DispensedAmount & "," & CommissionAmount & "," & mvATMPhysicalCassitteValue(1) & "," & mvATMPhysicalCassitteValue(2) & "," & mvATMPhysicalCassitteValue(3) & "," & mvATMPhysicalCassitteValue(4) & ",'" & CONFIGClass.LocalCountry & "','" & CONFIGClass.LocalBank & "','" & ATMId & "','" & TransactionSequence & "','" & Currency & "'," & DispensedRate & " )"
+
+
+                Case cnst_RequestType_NewWithdrawalCancelation
+                    Qstr += " WithdrawalStatus='" & cnst_ActionStatus_CANCELED & "' "
+                    Qstr += " ,WithdrawalDateTime= '" & ATMDateTime & "' "
+                    Qstr += " where  WithdrawalStatus ='" & cnst_ActionStatus_AUTHORIZED & "' "
+                    Qstr += " and TransactionCode ='" & Hosttransactioncode & "' "
+
+                    Subquery = " Insert into NewTransactionNestedActions (TransactionCode,action,ActionDateTime,ActionReason,ActionStatus,CountryCode,BankCode,ATMId) "
+                    Subquery += " values ('" & Hosttransactioncode & "','" & pAction & "',getdate(), '" & ActionReason & "','" & cnst_ActionStatus_CANCELED & "','" & CONFIGClass.LocalCountry & "','" & CONFIGClass.LocalBank & "','" & ATMId & "' )"
+
+
+
+                Case Else
+                    log.loglog("lUpdateRequestNew Error unknown action [" & pAction & "]", False)
+                    Return 8
+            End Select
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+            sqltrx = cn.BeginTransaction
+
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
+            cmd.Transaction = sqltrx
+            RowsAffected = cmd.ExecuteNonQuery()
+            If RowsAffected < 1 Then
+                log.loglog("lUpdateRequestNew Requet type =[" & pAction & "] Error with Qstr=[" & Qstr & "]  no rows affected", False)
+                sqltrx.Rollback()
+
+            End If
+            cmd.CommandText = Subquery
+            RowsAffected = cmd.ExecuteNonQuery()
+            If RowsAffected < 1 Then
+                log.loglog("lUpdateRequestNew Error with subquery =[" & Subquery & "]  no rows insreted", False)
+                sqltrx.Rollback()
+                Return cnst_ErrCode_BadStatusForRequiredRequestType
+            End If
+            sqltrx.Commit()
+            cn.Close()
+            cn = Nothing
+            cmd = Nothing
+            Return 0
+        Catch ex As Exception
+            log.loglog("lUpdateRequestNew Error with Qstr=[" & Qstr & "]" & vbNewLine & "Subqueru=[" & Subquery & "] Ex:" & ex.ToString, False)
+            Return 9
+        End Try
+
+    End Function
     Private Function InsertExceptionActions(ByVal pAction As String, ByVal pActionStatus As String) As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
         Dim cmd As System.Data.SqlClient.SqlCommand
@@ -2281,7 +2714,7 @@ Public Class MessageClass
             ds = New DataSet
             da.Fill(ds)
 
-            
+
 
             If ds.Tables.Count > 0 Then
                 log.loglog("UpdateRequestSetexpired Will Set (" & ds.Tables(0).Rows.Count & ") trx as expired query [" & SQstr & "]", "DeActivate", False)
@@ -2377,6 +2810,112 @@ nextRow:
         End Try
 
     End Function
+    Private Function UpdateRequestSetExpiredNew(ByVal logFlag As Boolean) As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim SQstr As String = ""
+        Dim Qstr As String = ""
+        Dim RowsAffected As Integer
+        Dim Subquery As String = ""
+        Dim sqltrx As SqlClient.SqlTransaction
+        Dim expCount As Long
+        Dim ds As DataSet
+        Dim da As System.Data.SqlClient.SqlDataAdapter
+        Dim thisTxCode As String
+        Try
+
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+
+            SQstr = "select * from NewTransactions  t inner join Remitters r on t.RemitterID = r.ID"
+            SQstr += " where ( WithdrawalStatus is null or WithdrawalStatus =  '" & cnst_ActionStatus_CANCELED & "' or WithdrawalStatus =  '" & cnst_ActionStatus_HOLD & "')"
+
+            SQstr += " And datediff(" & Chr(34) & "D" & Chr(34) & ", TransactionDateTime, getdate()) >= r.ExpirationDays"
+
+            log.loglog("UpdateRequestSetExpiredNew SQstr: " & SQstr, "DeActivate", True)
+            da = New System.Data.SqlClient.SqlDataAdapter(SQstr, cn)
+            ds = New DataSet
+            da.Fill(ds)
+
+
+
+            If ds.Tables.Count > 0 Then
+                log.loglog("UpdateRequestSetExpiredNew Will Set (" & ds.Tables(0).Rows.Count & ") trx as expired query [" & SQstr & "]", "DeActivate", False)
+
+                If ds.Tables(0).Rows.Count > 0 Then
+                    For expCount = 0 To ds.Tables(0).Rows.Count - 1
+                        thisTxCode = ""
+                        thisTxCode = ds.Tables(0).Rows(expCount).Item("TransactionCode").ToString()
+
+                        Qstr = "update NewTransactions  set "
+                        Qstr += "WithdrawalStatus='" & cnst_ActionStatus_EXPIRED & "'  "
+                        Qstr += ",WithdrawalDateTime=getdate()"
+                        Qstr += " where transactioncode='" & thisTxCode & "'"
+
+                        Subquery = " insert into  NewTransactionNestedActions "
+                        Subquery += " select  TransactionCode,'03', getdate(),'Expiration','EXPIRED',NULL ,0,0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL  from NewTransactions "
+                        Subquery += " where transactioncode='" & thisTxCode & "'"
+
+                        sqltrx = cn.BeginTransaction
+
+                        cmd = New System.Data.SqlClient.SqlCommand(Subquery, cn)
+                        cmd.Transaction = sqltrx
+
+                        RowsAffected = cmd.ExecuteNonQuery()
+                        If RowsAffected < 1 Then
+                            If logFlag Then
+                                log.loglog("UpdateRequestSetexpired Error (1) with subquery=[" & Subquery & "]  no rows affected", "DeActivate", True)
+                            End If
+                            sqltrx.Rollback()
+                            GoTo nextRow
+                            'Return cnst_ErrCode_NoExpiredTransactionsOrDBError
+                        End If
+                        cmd.CommandText = Qstr
+                        RowsAffected = cmd.ExecuteNonQuery()
+                        If RowsAffected < 1 Then
+                            If logFlag Then
+                                log.loglog("UpdateRequestSetExpiredNew Error (2) with Qstr =[" & Qstr & "]  no rows insreted", "DeActivate", True)
+                            End If
+                            sqltrx.Rollback()
+                            GoTo nextRow
+                            'Return cnst_ErrCode_NoExpiredTransactionsOrDBError
+                        End If
+                        sqltrx.Commit()
+
+
+
+nextRow:
+                    Next 'rows.count
+                Else
+                    'no transaction is there
+                    log.loglog("UpdateRequestSetExpiredNew Error no expired trx are there", "DeActivate", False)
+                End If
+            Else
+                'no tables is there
+                log.loglog("UpdateRequestSetExpiredNew Error no tables is there", "DeActivate", False)
+            End If ' ds.Tables.Count > 0
+
+
+
+
+            Try
+                da.Dispose()
+                da = Nothing
+            Catch ex As Exception
+            End Try
+
+            cn.Close()
+            cn = Nothing
+            cmd = Nothing
+
+            Return 0
+        Catch ex As Exception
+            log.loglog("UpdateRequestSetExpiredNew Error (3) with Qstr=[" & Qstr & "]" & vbNewLine & "Subqueru=[" & Subquery & "] Ex:" & ex.ToString, "DeActivate", True)
+            Return 9
+        End Try
+
+    End Function
     Private Function ForceUpdateRequestSetExpired(ByVal logFlag As Boolean) As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
         Dim cmd As System.Data.SqlClient.SqlCommand
@@ -2456,8 +2995,50 @@ nextRow:
 
     End Function
 
+    Public Sub NewDeActivateProcess()
+        Dim LastProcessingTime As Date
+        Dim rtrn As Integer
+        Dim logF As Boolean = False
+        Dim logF1 As Boolean = False
+        Dim logfNoRows As Boolean = True
+        LastProcessingTime = Now
+        log.loglog("NewDeActivateProcess, Will Start ...", "NewDeActivateProcess", False)
+        While Not ListnerClass.StopListnerFlag
+            Try
 
-    Public Sub DeActivateProcess()
+                If Now.Subtract(LastProcessingTime).TotalMinutes > CONFIGClass.DepositTransactionExpirationCheckPeriodMinutes Then
+                    LastProcessingTime = Now
+                    rtrn = UpdateRequestSetExpiredNew(logfNoRows)
+                    If rtrn = 8 Then
+                        logfNoRows = False
+                    Else
+                        logfNoRows = True
+                    End If
+                    If rtrn = 0 Then
+                        If Not logF1 Then
+                            logF1 = True
+                            log.loglog("NewDeActivateProcess, UpdateRequestSetExpired run successfully...", "DeActivate", True)
+                        End If
+                    Else
+                        logF1 = False
+                    End If
+
+                End If
+                Threading.Thread.Sleep(20000)
+                logF = False
+            Catch ex As Exception
+                If Not logF Then
+                    logF = True
+                    log.loglog("NewDeActivateProcess, Ex:" & ex.ToString, "NewDeActivateProcess", False)
+                End If
+            End Try
+        End While
+
+
+
+
+    End Sub
+    Sub DeActivateProcess()
         Dim LastProcessingTime As Date
         Dim rtrn As Integer
         Dim logF As Boolean = False
@@ -2616,8 +3197,7 @@ nextRow:
 
     End Function
 
-
-    Private Function isTransaction(ByRef pDepositCurrency As String) As Integer
+    Private Function isTransactionNew() As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
         Dim cmd As System.Data.SqlClient.SqlCommand
         Dim Qstr As String = ""
@@ -2626,9 +3206,48 @@ nextRow:
         Dim rtrn As String
         Try
 
+            Qstr = "select * from NewTransactions  "
+            Qstr += " where "
+            Qstr += " TransactionCode='" & Hosttransactioncode & "'"
+            Qstr += " and NationalID like '%" & NationalID & "'"
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
 
 
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
 
+            r = cmd.ExecuteReader
+            If Not r.HasRows Then
+                log.loglog("isTransactionNew Error with Qstr=[" & Qstr & "]  no rows are there", False)
+                rtrn = cnst_ErrCode_OriginalRequestNotFound
+                cn.Close()
+                cn = Nothing
+                cmd = Nothing
+            Else
+
+                cn.Close()
+                cn = Nothing
+                cmd = Nothing
+                rtrn = checkNewTransactionKeyTrials()
+            End If
+
+
+            Return rtrn
+        Catch ex As Exception
+            log.loglog("isTransactionNew Error with Qstr=[" & Qstr & "] Ex:" & ex.ToString, False)
+            Return 9
+        End Try
+
+    End Function
+    Private Function isTransaction(ByRef pDepositCurrency As String) As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim Qstr As String = ""
+        Dim r As SqlClient.SqlDataReader
+        Dim Subquery As String = ""
+        Dim rtrn As String
+        Try
 
             Qstr = "select * from transactions  "
             Qstr += " where "
@@ -2782,7 +3401,49 @@ nextRow:
 
     End Function
 
+    Private Function checkNewTransactionKeyTrials() As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim Qstr As String = ""
+        Dim r As SqlClient.SqlDataReader
+        Dim Subquery As String = ""
+        Dim rtrn As String
+        Try
+            Qstr = "select count(*) as trials from NewTransactionKeyCheckTrials "
+            Qstr += " where "
+            Qstr += " TransactionCode='" & Hosttransactioncode & "'"
+            Qstr += " and TrialFlag=0"
 
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+
+
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
+
+            r = cmd.ExecuteReader
+            If Not r.HasRows Then
+                log.loglog("checkNewTransactionKeyTrials Error with Qstr=[" & Qstr & "]  no rows are there", False)
+                rtrn = 0
+            Else
+                r.Read()
+                If r("trials") >= mvMaximumKeyTrials Then
+                    rtrn = cnst_ErrCode_ManyKeyTrilas
+                Else
+                    rtrn = 0
+                End If
+            End If
+
+            cn.Close()
+            cn = Nothing
+            cmd = Nothing
+            Return rtrn
+        Catch ex As Exception
+            log.loglog("checkNewTransactionKeyTrials Error with Qstr=[" & Qstr & "] Ex:" & ex.ToString, False)
+            Return 9
+        End Try
+
+    End Function
 
     Private Function checkBlockedMobile(ByVal pMobileNumber As String, ByVal DepositorOrBenificiary As Integer) As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
@@ -2912,7 +3573,89 @@ nextRow:
 
     End Function
 
+    Private Function ResetNewTransactionKeyTrials() As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim Qstr As String = ""
+        Dim r As Integer
+        Dim Subquery As String = ""
+        'Dim rtrn As String
+        Try
+            Qstr = "update NewTransactionKeyCheckTrials  set TrialFlag=1"
+            Qstr += " where "
+            Qstr += " TransactionCode='" & Hosttransactioncode & "'"
 
+
+
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+
+
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
+
+            r = cmd.ExecuteNonQuery
+            If r < 1 Then
+                log.loglog("ResetNewTransactionKeyTrials Error with Qstr=[" & Qstr & "]  no rows are affected", False)
+
+            End If
+
+            cn.Close()
+            cn = Nothing
+            cmd = Nothing
+            Return 0
+        Catch ex As Exception
+            log.loglog("ResetNewTransactionKeyTrials Error with Qstr=[" & Qstr & "] Ex:" & ex.ToString, False)
+            Return 9
+        End Try
+
+    End Function
+
+    Private Function lCheckPINsNew() As Integer
+        Dim cn As System.Data.SqlClient.SqlConnection
+        Dim cmd As System.Data.SqlClient.SqlCommand
+        Dim Qstr As String = ""
+        Dim r As SqlClient.SqlDataReader
+        Dim Subquery As String = ""
+        Dim rtrn As Integer
+        Try
+            Qstr = "select * from NewTransactions  "
+            Qstr += " where "
+            Qstr += " TransactionCode='" & Hosttransactioncode & "'"
+            Qstr += " and   BankCode='" & CONFIGClass.LocalBank & "'"
+            Qstr += " and   CountryCode='" & CONFIGClass.LocalCountry & "'"
+            cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
+            cn.Open()
+
+
+            cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
+
+            r = cmd.ExecuteReader
+            If Not r.HasRows Then
+                log.loglog("lCheckPINsNew Error with Qstr=[" & Qstr & "]  no rows are there", False)
+                lNewInsertKeyCkecTrial()
+                rtrn = cnst_ErrCode_WrongPINs
+            Else
+                r.Read()
+                Try
+                    Amount = r("Amount")
+                    rtrn = 0
+                Catch ex As Exception
+                    log.loglog("lCheckPINsNew bad or null Amount  with Qstr=[" & Qstr & "]  ex:[" & ex.ToString & "]", False)
+                    rtrn = cnst_ErrCode_PadorNullAmountValue
+                End Try
+
+            End If
+
+            cn.Close()
+            cn = Nothing
+            cmd = Nothing
+            Return rtrn
+        Catch ex As Exception
+            log.loglog("lCheckPINsNew Error with Qstr=[" & Qstr & "] Ex:" & ex.ToString, False)
+            Return 9
+        End Try
+
+    End Function
     Private Function lCheckPINs() As Integer
         Dim cn As System.Data.SqlClient.SqlConnection
         Dim cmd As System.Data.SqlClient.SqlCommand
@@ -3089,7 +3832,7 @@ nextRow:
 
         Try
             Qstr = "select * from ATM where "
-            Qstr = Qstr & " ATMId='" & pATMId & "' and bankcode='" & BankId & "' and CountryCode='" & Country & "'"
+            Qstr = Qstr & " ATMId='" & pATMId & "' and bankcode='" & CONFIGClass.LocalBank & "' and CountryCode='" & CONFIGClass.LocalCountry & "'"
 
             cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
             cn.Open()
@@ -3468,6 +4211,49 @@ nextRow:
         Catch ex As Exception
             log.loglog("lFormReply Error:" & vbNewLine & toString(), False)
             log.loglog("lFormReply Error:" & ex.ToString, False)
+            Return (9)
+        End Try
+
+    End Function
+
+    Private Function lNewFormReply(ByRef loutGoingNewReplyData As String) As Integer
+        Dim rspCodeInt As Integer
+
+        Try
+            '------------- just log all activities done on the atm ------
+            Try
+                rspCodeInt = Val(ResponseCode)
+
+
+            Catch ex As Exception
+
+            End Try
+            '---------------------------------------------------------------
+             Dim fs = Chr(28)
+            loutGoingNewReplyData = ""
+            loutGoingNewReplyData += RequestType
+            loutGoingNewReplyData += fs
+            loutGoingNewReplyData += ATMId
+            loutGoingNewReplyData += fs
+            loutGoingNewReplyData += ATMDateTime
+            loutGoingNewReplyData += fs
+            loutGoingNewReplyData += TransactionSequence
+            loutGoingNewReplyData += fs
+            loutGoingNewReplyData += ResponseCode
+
+            If RequestType = cnst_RequestType_NewWithdrawalAuthorization Then
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += DispensedAmount
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += CommissionAmount
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += DispensedNotes
+            End If
+
+            Return 0
+        Catch ex As Exception
+            log.loglog("lNewFormReply Error:" & vbNewLine & toString(), False)
+            log.loglog("lNewFormReply Error:" & ex.ToString, False)
             Return (9)
         End Try
 

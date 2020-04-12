@@ -8,6 +8,7 @@ Module Main
     Public mvLogPath
     Public EODTime
     Public EODPath As String
+    Public NewEODPath As String
     Public FilePath As String
     Public ConnStrConfig
     Public WithDrawalHostFlag
@@ -490,7 +491,7 @@ Module Main
                     loglog("Can not read Deposit code, it will be 'DEPOSIT'", True)
                     DepositCode = "DEPOSIT"
                 End Try
-                
+
                 Try
                     If TmpItem.Name.ToUpper = "WithdrawalCode".ToUpper Then
                         WithdrawalCode = TmpItem.InnerText
@@ -561,4 +562,173 @@ Module Main
         End Try
 
     End Sub
+
+
+    Public Function GetMoneyFerEODNewData(ByVal EODdatetime As String, ByRef DT As DataTable) As Boolean
+        Dim QSTR As String
+        Dim Flag As Boolean
+
+        Try
+
+
+            QSTR = "Select * from NewTransactionsView where WithdrawalDateTime is not null and WithdrawalDateTime <= '" & EODdatetime & "' and (EODFlag is null or EODFlag = 0) order by ActionDateTime"
+            Flag = ConnectToDatabase(QSTR, ConnStrConfig, DT)
+            If Flag = True Then
+                loglog("Executing [" & QSTR & "] count = " & DT.Rows.Count & " For NewEODdate = " & EODdatetime, True)
+                loglog("MoneyFerEODNewData count = " & DT.Rows.Count & " For NewEODdate = " & EODdatetime, True)
+                GetMoneyFerEODNewData = True
+            Else
+                GetMoneyFerEODNewData = False
+            End If
+
+
+
+
+        Catch ex As Exception
+            GetMoneyFerEODNewData = False
+            loglog("GetMoneyFerEODNewData Error ex = " & ex.Message, True)
+        End Try
+    End Function
+
+    Public Function UpdateEODNewData(ByVal EODdatetime As String) As Boolean
+        Dim i As Integer
+        Dim QSTR As String
+        Dim Flag As Boolean
+        Dim DTF As DataTable
+        Dim myConnection As SqlConnection
+        Dim myCommand As SqlCommand
+        Dim RowsAffected As String
+        Try
+            myConnection = New SqlConnection(ConnStrConfig)
+            myConnection.Open()
+            myCommand = New SqlCommand
+            myCommand.Connection = myConnection
+            myCommand.Transaction = myConnection.BeginTransaction
+
+
+            QSTR = " update NewTransactions set EODFlag = 1,EODDateTime = Getdate() where WithdrawalDateTime is not null and WithdrawalDateTime <= '" & EODdatetime & "'"
+
+            loglog("Updating Transaction [" & QSTR & "]  ", True)
+                myCommand.CommandText = QSTR
+                RowsAffected = myCommand.ExecuteNonQuery()
+
+            If RowsAffected < 1 Then
+                myCommand.Transaction.Rollback()
+                UpdateEODNewData = False
+
+                Exit Function
+
+            End If
+
+            myCommand.Transaction.Commit()
+            myConnection.Close()
+
+            UpdateEODNewData = True
+        Catch ex As Exception
+            myCommand.Transaction.Rollback()
+            myConnection.Close()
+            UpdateEODNewData = False
+            loglog("UpdateEODNewData Error ex = " & ex.ToString() & i, True)
+        End Try
+    End Function
+
+
+    Public Function WriteEODNewFile(ByVal Rows As DataRow()) As Boolean
+        Dim i As Integer
+        Dim Transactioncode, ATMID, NationalID, ATMDateTime, ATMTransactionSequence, WithdrawalStatus, amount, WithdrawalDateTime, CommissionAmount, DispensedNotes, DispensedAmount, BeneficiaryName, TransactionDateTime, RemitterName As String
+
+        Dim StrAll As String
+
+        Dim StrWrite As String = ""
+        Dim SR As IO.StreamWriter
+        Try
+
+            If Rows.Length >= 1 Then
+                For i = 0 To Rows.Length - 1
+                    StrAll = ""
+                    'loglog("1", True)
+                    If Rows(i).Item("Transactioncode") = "" Then
+                        Transactioncode = "000000000000"
+                    Else
+                        Transactioncode = Rows(i).Item("Transactioncode")
+                    End If
+                    'loglog("2", True)
+                    Transactioncode = Format(CLng(Transactioncode), "000000000000")
+                    Transactioncode = Transactioncode.Substring(0, 12)
+                    'loglog("3", True)
+                    ATMID = Rows(i).Item("ATMId") & "00000000"
+                    ATMID = ATMID.Substring(0, 8)
+                    'loglog("4", True)
+                    NationalID = Rows(i).Item("NationalID")
+
+                    'loglog("5", True)
+                    ATMDateTime = Rows(i).Item("ATMDateTime")
+                    ATMTransactionSequence = Rows(i).Item("ATMTransactionSequence")
+                    WithdrawalStatus = Rows(i).Item("WithdrawalStatus")
+                    WithdrawalDateTime = CStr(Format(Rows(i).Item("WithdrawalDateTime"), "yyyy-MM-dd HH:mm:ss"))
+                    If Rows(i).Item("CommissionAmount") Is DBNull.Value Then
+                        CommissionAmount = "0"
+                    Else
+                        CommissionAmount = Rows(i).Item("CommissionAmount")
+                    End If
+                    CommissionAmount = Format(CLng(CommissionAmount), "000000").ToString & "00"
+                    CommissionAmount = CommissionAmount.Substring(0, 8)
+
+                    If Rows(i).Item("amount") Is DBNull.Value Then
+                        amount = "0"
+                    Else
+                        amount = Rows(i).Item("amount")
+                    End If
+
+                    amount = Format(CLng(amount), "000000") & "00"
+                    amount = amount.Substring(0, 8)
+                    'loglog("11", True)
+
+
+                    'loglog("12", True)
+                    If Rows(i).Item("DispensedAmount") Is DBNull.Value Then
+                        DispensedAmount = "0"
+                    Else
+                        DispensedAmount = Rows(i).Item("DispensedAmount")
+                    End If
+
+                    DispensedAmount = Format(CLng(DispensedAmount), "000000") & "00"
+                    DispensedAmount = DispensedAmount.Substring(0, 8)
+
+                    If Rows(i).Item("DispensedNotes") Is DBNull.Value Then
+                        DispensedNotes = "0"
+                    Else
+                        DispensedNotes = Rows(i).Item("DispensedNotes")
+                        If DispensedNotes.Trim = "" Then
+                            DispensedNotes = "0"
+                        Else
+                            DispensedNotes = Rows(i).Item("DispensedNotes")
+                        End If
+                    End If
+                    'loglog("15", True)
+
+                    DispensedNotes = Format(CLng(DispensedNotes), "00000000").ToString
+
+                    BeneficiaryName = Rows(i).Item("BeneficiaryName")
+                    TransactionDateTime = CStr(Format(Rows(i).Item("TransactionDateTime"), "yyyy-MM-dd HH:mm:ss"))
+                    RemitterName = Rows(i).Item("RemitterName")
+                    StrAll = Transactioncode & "," & NationalID & "," & BeneficiaryName & "," & RemitterName & "," & TransactionDateTime & "," & ATMTransactionSequence & "," &
+                    StrAll = StrAll & ATMID & "," & ATMDateTime & "," & amount & "," & DispensedAmount & "," & CommissionAmount & "," & DispensedNotes & "," & WithdrawalStatus & "," & WithdrawalDateTime
+                    StrWrite = StrWrite & StrAll
+                Next
+                If Right(NewEODPath, 1) <> "\" Then
+                    NewEODPath = NewEODPath & "\"
+                End If
+                FilePath = NewEODPath & "NewCashRemittanceEOD" & Now.Day & Now.Month & Now.Year & Now.Hour & Now.Minute & ".txt"
+                SR = New StreamWriter(FilePath)
+                SR.Write(StrWrite)
+                SR.Close()
+                WriteEODNewFile = True
+
+            End If
+        Catch ex As Exception
+            loglog("WriteEODNewFile Error ex = " & ex.ToString() & i, True)
+            WriteEODNewFile = False
+        End Try
+    End Function
 End Module
