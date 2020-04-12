@@ -8,13 +8,27 @@ using System.Threading;
 
 namespace NCR.EG.Remittance.BulkUploader
 {
+    public class BulkFileRecord
+    {
+        public int FieldsCount { get; internal set; }
+        public int AmountIndex { get; internal set; }
+        public int NationalIdIndex { get; internal set; }
+        public int MobileNumberIndex { get; internal set; }
+        public int NameIndex { get; internal set; }
+        public int RemitterIdIndex { get; internal set; }
+        public int ReferenceIndex { get; internal set; }
+    }
+
     public class BulkHandler
     {
-        List<Model.FileTransaction> FileTrxList;
-        List<Model.FileTransaction> ConfirmedFileTrxList;
+        List<Model.FileTransaction> FileTrxList;            //all the bulk file lines 
+        List<Model.FileTransaction> ConfirmedFileTrxList;   //all the recors inside the biulk file
         List<string> ErrorParsedRecords;
-        //List<Model.RemittanceTrasnaction> RemTrxList;
+        BulkFileRecord recordIndexes;
+        private string headerString;
         string strLogDesc = "";
+        
+
         public BulkHandler()
         {
             FileTrxList = new List<Model.FileTransaction>();
@@ -22,6 +36,10 @@ namespace NCR.EG.Remittance.BulkUploader
             ConfirmedFileTrxList = new List<Model.FileTransaction>();
         }
 
+        internal void SetRecordType(BulkFileRecord record)
+        {
+            recordIndexes = record;
+        }
         internal int ProcessFile(string bulkFilePath)
         {
             try
@@ -31,50 +49,69 @@ namespace NCR.EG.Remittance.BulkUploader
                 LogClass.Log(Environment.NewLine, false, 0);
                 if (!File.Exists(bulkFilePath))
                 {
-                    LogClass.CreateLogDescription(ref strLogDesc, "BulkHandler.ProcessFile", "Infromation", bulkFilePath + " Not Found");
+                    LogClass.CreateLogDescription(ref strLogDesc, "BulkHandler2.ProcessFile", "Infromation", bulkFilePath + " Not Found");
                     LogClass.Log(strLogDesc, false, 0);
                     return ConstantsClass.ERROR_FILE_NOT_FOUND;
                 }
                 List<string> allLinesText = File.ReadAllLines(bulkFilePath).ToList();
-                LogClass.CreateLogDescription(ref strLogDesc, "BulkHandler.ProcessFile", "Information", "Number of records before parsing [" + allLinesText.Count() + "]");
+                LogClass.CreateLogDescription(ref strLogDesc, "BulkHandler2.ProcessFile", "Information", "Number of records before parsing [" + allLinesText.Count() + "]");
                 LogClass.Log(strLogDesc, false, 0);
-
+                int flagHeader = 0;
                 foreach (string tmpStr in allLinesText)
                 {
+                    if(ConfigClass.BulkFileHaveHeader && flagHeader == 0)
+                    {
+                        headerString = tmpStr;
+                        flagHeader = 1;
+                        continue;
+                    }
                     //Mobile Number|National ID|Amount|Remitter name
                     if (!string.IsNullOrEmpty(tmpStr))
                     {
+                        flagHeader = 1;
                         string[] data = tmpStr.Split(ConfigClass.DataFileSeparator);
-                        if (data.Length >= ConfigClass.MinimumDataNumber)
+                        //no missing fields??
+                        if (data.Length >= recordIndexes.FieldsCount)
                         {
-                            if (!string.IsNullOrEmpty(data[0].Trim()) && !string.IsNullOrEmpty(data[1].Trim()) && !string.IsNullOrEmpty(data[3].Trim()))
+                            //string values not null?
+                            if (!string.IsNullOrEmpty(data[recordIndexes.MobileNumberIndex].Trim()) && !string.IsNullOrEmpty(data[recordIndexes.NationalIdIndex].Trim()) && !string.IsNullOrEmpty(data[recordIndexes.NameIndex].Trim()))
                             {
-                                int tmpInt = 0;
-                                int amt = 0;
-                                bool ok = int.TryParse(data[2].Trim(), out tmpInt);
+                                int amt = int.MinValue;
+                                //Validate amount is integer
+                                bool ok = ValidateConvertToInteger(data[recordIndexes.AmountIndex].Trim(), ref amt);
                                 if (!ok)
                                 {
                                     ErrorParsedRecords.Add(tmpStr);
-                                    //LogClass.Log(string.Format(errorStr, DateTime.Now.ToString("dd/MM HH:mm:ss.fff"), ("Error" + new string(' ', 11)).Substring(0, 11), "Counldn't convert to number " + data[2].Trim()), false, 0);
                                 }
+
                                 else
                                 {
-                                    amt = tmpInt;
-                                    Model.FileTransaction FT = new Model.FileTransaction(data[0].Trim(), data[1].Trim(), amt, data[3].Trim());
-                                    retVal = FT.GenerateReference2();
-                                    if (retVal == ConstantsClass.OK)
-                                        FileTrxList.Add(FT);
-                                    else
+                                    int rid = int.MinValue;
+                                    //Validate remitter id is integer
+                                    ok = ValidateConvertToInteger(data[recordIndexes.RemitterIdIndex].Trim(), ref rid);
+                                    if (!ok)
                                     {
                                         ErrorParsedRecords.Add(tmpStr);
-                                        //LogClass.Log(string.Format(errorStr, DateTime.Now.ToString("dd/MM HH:mm:ss.fff"), ("Error" + new string(' ', 11)).Substring(0, 11), "Model.FileTransaction.GenerateReference return [" + retVal.ToString() + "]"), false, 0);
+                                    }
+                                    else
+                                    {
+                                        Model.FileTransaction FT = new Model.FileTransaction(data[recordIndexes.MobileNumberIndex].Trim(), data[recordIndexes.NationalIdIndex].Trim(), data[recordIndexes.NameIndex].Trim(), rid, amt);
+                                        retVal = FT.GenerateReference2();
+                                        //Reference Number Ok?
+                                        if (retVal == ConstantsClass.OK)
+                                        { 
+                                            FileTrxList.Add(FT);
+                                        }
+                                        else
+                                        {
+                                            ErrorParsedRecords.Add(tmpStr);
+                                        }
                                     }
                                 }
                             }
                             else
                             {
                                 ErrorParsedRecords.Add(tmpStr);
-                                //LogClass.Log(string.Format(errorStr, DateTime.Now.ToString("dd/MM HH:mm:ss.fff"), ("Error" + new string(' ', 11)).Substring(0, 11), "empty fields detected"), false, 0);
                             }
                         }
                         else
@@ -83,26 +120,28 @@ namespace NCR.EG.Remittance.BulkUploader
                             //LogClass.Log(string.Format(errorStr, DateTime.Now.ToString("dd/MM HH:mm:ss.fff"), ("Error" + new string(' ', 11)).Substring(0, 11), "Couldn't process the data in [" + tmpStr + "] record, data values less than " + ConfigClass.MinimumDataNumber), false, 0);
                         }
                     }
-                    else
-                    {
-                        //LogClass.Log(string.Format(errorStr, DateTime.Now.ToString("dd/MM HH:mm:ss.fff"), ("Infromation" + new string(' ', 11)).Substring(0, 11), "Empty line found in file"), false, 0);
-                    }
                 }
-
-                LogClass.CreateLogDescription(ref strLogDesc, "BulkHandler.ProcessFile", "Information", "Number of records after parsing [" + FileTrxList.Count() + "]");
+                LogClass.CreateLogDescription(ref strLogDesc, "BulkHandler2.ProcessFile", "Information", "Number of records after parsing [" + FileTrxList.Count() + "]");
                 LogClass.Log(strLogDesc, false, 0);
-                retVal = BulkInsertIntoDB(FileTrxList);
+                retVal = InsertIntoDB(FileTrxList);
                 GenreateOutputPackage();
 
                 return ConstantsClass.OK;
             }
             catch (Exception ex)
             {
-
-                LogClass.LogError(ex, "BulkHandler.ProcessFile", "Exception");
+                LogClass.LogError(ex, "BulkHandler2.ProcessFile", "Exception");
                 return ConstantsClass.PROCESS_FILE_EXCEPTION;
             }
 
+        }
+
+        private bool ValidateConvertToInteger(string v, ref int amt)
+        {
+            int tmpInt = 0;
+            bool ok = int.TryParse(v, out tmpInt);
+            amt = tmpInt;
+            return ok;
         }
 
         private void GenreateOutputPackage()
@@ -122,6 +161,18 @@ namespace NCR.EG.Remittance.BulkUploader
             {
                 retVal = CreateErrorOutputFile(ErrorParsedRecords, errorFile);
             }
+            MoveWithReplace(ConfigClass.BulkFilePath + ConfigClass.BulkFileName, outputDirectory + ConfigClass.BulkFileName);
+        }
+
+
+        //delete target file if exists, as File.Move() does not support overwrite
+        public static void MoveWithReplace(string sourceFileName, string destFileName)
+        {
+            if (File.Exists(destFileName))
+            {
+                File.Delete(destFileName);
+            }
+            File.Move(sourceFileName, destFileName);
         }
 
         private int CreateOutputFile(List<FileTransaction> confirmedFileTrxList, string path)
@@ -129,18 +180,29 @@ namespace NCR.EG.Remittance.BulkUploader
             try
             {
                 string output = string.Empty;
-                string templateString = "{0}" + ConfigClass.DataFileSeparator.ToString() + "{1}" + ConfigClass.DataFileSeparator.ToString() + "{2}" + ConfigClass.DataFileSeparator.ToString() + "{3}" + ConfigClass.DataFileSeparator.ToString() + "{4}";
+                string templateString = "{0}" + ConfigClass.DataFileSeparator.ToString() + "{1}" + ConfigClass.DataFileSeparator.ToString() + "{2}" + ConfigClass.DataFileSeparator.ToString() + "{3}" + ConfigClass.DataFileSeparator.ToString() + "{4}" + ConfigClass.DataFileSeparator.ToString() + "{5}";
+                if(ConfigClass.BulkFileHaveHeader)
+                {
+                    if(headerString.EndsWith(";"))
+                    {
+                        output += headerString + "TransactionReferenceNumber;" + Environment.NewLine;
+                    }
+                    else
+                    {
+                        output += headerString + ";TransactionReferenceNumber;" + Environment.NewLine;
+                    }
+                }
                 foreach (FileTransaction trx in confirmedFileTrxList)
                 {
                     //Mobile Number|National ID|Amount|Remitter name|ReferenceNumber
-                    output += string.Format(templateString, trx.MobileNumber, trx.NationalID, trx.Amount, trx.Name, trx.ReferenceNumber) + Environment.NewLine;
+                    output += string.Format(templateString, trx.MobileNumber, trx.NationalID, trx.Amount, trx.Name, trx.RemitterId , trx.ReferenceNumber) + Environment.NewLine;
                 }
                 System.IO.File.WriteAllText(path, output);
                 return ConstantsClass.OK;
             }
             catch (Exception ex)
             {
-                LogClass.LogError(ex, "BulkHandler.CreateOutputFile", "Exception");
+                LogClass.LogError(ex, "BulkHandler2.CreateOutputFile", "Exception");
                 return ConstantsClass.WRITE_FILE_EXCEPTION;
             }
         }
@@ -150,6 +212,10 @@ namespace NCR.EG.Remittance.BulkUploader
             try
             {
                 string output = string.Empty;
+                if (ConfigClass.BulkFileHaveHeader)
+                {
+                    output += headerString + Environment.NewLine;
+                }
                 foreach (string err in errorParsedRecords)
                 {
                     //Mobile Number|National ID|Amount|Remitter name|ReferenceNumber
@@ -160,7 +226,7 @@ namespace NCR.EG.Remittance.BulkUploader
             }
             catch (Exception ex)
             {
-                LogClass.LogError(ex, "BulkHandler.CreateErrorOutputFile", "Exception");
+                LogClass.LogError(ex, "BulkHandler2.CreateErrorOutputFile", "Exception");
                 return ConstantsClass.WRITE_FILE_EXCEPTION;
             }
         }

@@ -19,8 +19,8 @@ namespace NCR.EG.Remittance.BulkUploader
             string Qstr = string.Empty;
             try
             {
-                Qstr = "INSERT INTO [NewTransactions]([TransactionCode],[NationalID],[Amount]) VALUES ('{0}','{1}',{2})";
-                Qstr = string.Format(Qstr, Trx.ReferenceNumber, Trx.NationalID, Trx.Amount);
+                Qstr = "INSERT INTO [dbo].[NewTransactions] ([TransactionCode],[NationalID],[Amount],[RemitterID],[BeneficiaryName],[TransactionDateTime]) VALUES ('{0}','{1}',{2},{3},'{4}',GETDATE())";
+                Qstr = string.Format(Qstr, Trx.ReferenceNumber, Trx.NationalID, Trx.Amount,Trx.RemitterId,Trx.Name);
                 cn = new System.Data.SqlClient.SqlConnection(ConfigClass.ConnectionString);
                 cn.Open();
                 cmd = new System.Data.SqlClient.SqlCommand(Qstr, cn);

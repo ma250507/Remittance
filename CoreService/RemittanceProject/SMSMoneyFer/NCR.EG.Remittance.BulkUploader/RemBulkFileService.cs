@@ -10,6 +10,7 @@ namespace NCR.EG.Remittance.BulkUploader
         System.Threading.TimerCallback dl;
         System.Threading.Timer ti;
         string strLogDescription;
+        BulkFileRecord record;
         public RemBulkFileService()
         {
             InitializeComponent();
@@ -22,6 +23,16 @@ namespace NCR.EG.Remittance.BulkUploader
 
         public void MyStart()
         {
+            record = new BulkFileRecord();
+            record.FieldsCount = 5;
+            record.MobileNumberIndex = 0;
+            record.NationalIdIndex = 1;
+            record.AmountIndex = 2;
+            record.NameIndex = 3;
+            record.RemitterIdIndex = 4;
+
+            record.ReferenceIndex = 5;
+
             try
             {
                 st = new StatClass();
@@ -53,7 +64,10 @@ namespace NCR.EG.Remittance.BulkUploader
             try
             {
                 ti.Change(Timeout.Infinite, System.Convert.ToInt32(ConfigClass.CheckFileInterval));  // disable
+                //MK customizable record type
                 BulkHandler handler = new BulkHandler();
+                handler.SetRecordType(record);
+                
                 int retVal = handler.ProcessFile(ConfigClass.BulkFilePath + ConfigClass.BulkFileName);
                 if (retVal == ConstantsClass.OK)
                 {

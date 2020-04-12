@@ -44,7 +44,7 @@ namespace NCR.EG.Remittance.BulkUploader
         public static string OutputFilePath { get; internal set; }
         public static string OutputFileName { get; internal set; }
         public static string ErrorOutputFilePath { get; internal set; }
-        public static string FullBulkFileName { get; internal set; }
+        public static bool BulkFileHaveHeader { get; internal set; }
 
         public static int ReadConfig()
         {
@@ -286,6 +286,11 @@ namespace NCR.EG.Remittance.BulkUploader
                             CheckFileInterval = 60 * 60 * 1000;
                         else
                             CheckFileInterval = intTmp * 60 * 1000;
+                    }
+                    else if(tmpItem.Name.ToUpper() == "BulkFileHaveHeader".ToUpper())
+                    {
+                        string data = tmpItem.InnerText;
+                        BulkFileHaveHeader = (data == "1") ? true : false;
                     }
                     else if (tmpItem.Name.ToUpper() == "DataFileSeparator".ToUpper())
                     {

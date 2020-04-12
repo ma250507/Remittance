@@ -9,12 +9,17 @@ namespace NCR.EG.Remittance.BulkUploader.Model
         public string NationalID { get; internal set; }
         public string Name { get; internal set; }
         public string ReferenceNumber { get; internal set; }
-        public FileTransaction(string _mob, string _nationalId, int _amount, string _name)
+        public int RemitterId { get; internal set; }
+
+
+
+        public FileTransaction(string _mob, string _nationalId, string _name, int remitterId, int _amount)
         {
             MobileNumber = _mob;
             Amount = _amount;
             NationalID = _nationalId;
             Name = _name;
+            RemitterId = remitterId;
         }
 
         internal int GenerateReference()
@@ -54,7 +59,7 @@ namespace NCR.EG.Remittance.BulkUploader.Model
 
             try
             {
-                System.Threading.Thread.Sleep(2);
+                System.Threading.Thread.Sleep(1);
                 var days = DateTime.Now.ToString("yyMMdd");
                 var ttimes = DateTime.Now.ToString("HHmmssffffff");
                 long vOut = Convert.ToInt64(ttimes);

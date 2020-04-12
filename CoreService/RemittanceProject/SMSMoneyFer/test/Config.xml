@@ -20,19 +20,20 @@
   </Email>
   <Database>
     <DataSource>.</DataSource>
-    <InitialCatalog>Fawry</InitialCatalog>
+    <InitialCatalog>BMRem</InitialCatalog>
     <IntegratedSecurity>true</IntegratedSecurity>
     <UserId>sa</UserId>
     <password>XIVDHEIAIBXYHUGFCGJVIBGFUDVDCZDUUBFDDGXEHUDVCBECEDBYXFHEIEVVCEXJ</password>
   </Database>
   <ServiceConfiguration>
-    <BulkFilePath>C:\example\</BulkFilePath>
-    <BulkFileName>fileupload</BulkFileName>
-    <OutputFilePath>C:\bulkOutput\</OutputFilePath>
-    <OutputFileName>RESULT</OutputFileName>
-    <CheckFileInterval>1</CheckFileInterval> <!-- minutes -->
+    <BulkFilePath>C:\Stacks</BulkFilePath>
+    <BulkFileName>test-min.csv</BulkFileName>
+    <OutputFilePath>C:\Stacks\</OutputFilePath>
+    <OutputFileName>PROCESSED</OutputFileName>
+    <CheckFileInterval>1</CheckFileInterval>    <!-- minutes -->
     <DataFileSeparator>;</DataFileSeparator>
     <MinimumDataNumber>4</MinimumDataNumber>
+    <PINLength>4</PINLength>
     <BulkFileHaveHeader>1</BulkFileHaveHeader>
   </ServiceConfiguration>
 </Config>
