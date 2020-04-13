@@ -66,7 +66,7 @@ Partial Class NewBulkTransactionsReport
 
                     Else
                         MainDT.TableName = "MyTable"
-                        MainDT.WriteXmlSchema("C:\BMRemittanceReport\NewBulkTransactions.xsd")
+                        'MainDT.WriteXmlSchema("C:\BMRemittanceReport\NewBulkTransactions.xsd")
                         RepDoc.SetDataSource(MainDT)
                     End If
                     'DS.WriteXmlSchema("C:\Expired.xsd")

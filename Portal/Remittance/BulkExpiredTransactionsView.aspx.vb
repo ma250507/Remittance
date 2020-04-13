@@ -61,7 +61,7 @@ Partial Class BulkExpiredTransactionsView
 
                     Else
                         MainDT.TableName = "MyTable"
-                        MainDT.WriteXmlSchema("C:\BMRemittanceReport\BulkExpiredTransactions.xsd")
+                        'MainDT.WriteXmlSchema("C:\BMRemittanceReport\BulkExpiredTransactions.xsd")
                         RepDoc.SetDataSource(MainDT)
                     End If
                     'DS.WriteXmlSchema("C:\Expired.xsd")
