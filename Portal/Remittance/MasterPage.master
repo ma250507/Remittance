@@ -7,17 +7,17 @@
 <title>BANK NAME</title>
 
 
-<link href="css/style.css" rel="stylesheet" type="text/css" />
-<link href="css/diQuery-collapsiblePanel.css" rel="stylesheet" type="text/css" />
- <link rel="stylesheet" href="css/nivo-slider.css" type="text/css" media="screen" />
- <link type="text/css" rel="stylesheet" href="css/datepickercontrol.css"/> 
-<link rel="stylesheet" href="css/example.css" type="text/css" media="screen"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css" />
+<link href="../css/diQuery-collapsiblePanel.css" rel="stylesheet" type="text/css" />
+ <link rel="stylesheet" href="../css/nivo-slider.css" type="text/css" media="screen" />
+ <link type="text/css" rel="stylesheet" href="../css/datepickercontrol.css"/> 
+<link rel="stylesheet" href="../css/example.css" type="text/css" media="screen"/>
 
 
- <script type="text/javascript" src="scripts/datepickercontrol.js"></script>
- <script type="text/javascript" src="scripts/jquery-1.4.3.min.js"></script>
-    <script type="text/javascript" src="scripts/jquery.nivo.slider.pack.js"></script>
-    <script type="text/javascript" src="scripts/diQuery-collapsiblePanel.js"></script>
+ <script type="text/javascript" src="../scripts/datepickercontrol.js"></script>
+ <script type="text/javascript" src="../scripts/jquery-1.4.3.min.js"></script>
+    <script type="text/javascript" src="../scripts/jquery.nivo.slider.pack.js"></script>
+    <script type="text/javascript" src="../scripts/diQuery-collapsiblePanel.js"></script>
     <script type="text/javascript">
     $(window).load(function() {
         $('#slider').nivoSlider( {effect:'fade', //Specify sets like: 'fold,fade,sliceDown'
@@ -59,6 +59,7 @@
   <div id="navbar"  >
       <ul id="Menu" runat="server" >
         <li id="Report" runat="server" ><a href="Reports.aspx">Reports</a></li>
+          <li id="BulkTransactionReports" runat="server" ><a href="BulkTransactionReports.aspx">BulkReports</a></li>
         <li id="Maintenance" runat="server" ><a href="Maintenance-Main.aspx">Maintenance</a></li>
         <li id="Teller" runat="server" ><a href="Teller-Main.aspx">Teller</a></li>
         <li id="Users" runat="server" ><a href="Users-Main.aspx">Users</a></li>

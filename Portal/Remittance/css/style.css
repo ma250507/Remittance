@@ -74,7 +74,7 @@ body
 	background-color: #FFFFFF;
 	border-bottom: 1px solid #C8C8C8;
 	padding: 3px 0 3px 0;
-	background-image: url( 'file:///F:/Documents and Settings/MyWorkShop/My Documents/Visual Studio 2008/WebSites/Remittance/../Images/home.jpg' );
+	background-image: url( '../Images/home.jpg' );
 }
 h1, h2, h3, h4, h5, h6 { margin: 15px 0; }
 p, ul, ol { margin: 15px 0; }

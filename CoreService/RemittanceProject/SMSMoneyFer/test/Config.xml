@@ -18,6 +18,28 @@
     <BankCode></BankCode>
     <SendEmailTo>mail@delivery.com|mail2@delivery2.com</SendEmailTo>
   </Email>
+  <BusinessRules>
+    <ATMIdLength>5</ATMIdLength>
+    <BankIdLength>5</BankIdLength>
+    <CountryCodeLength>10</CountryCodeLength>
+    <LocalCountry>20</LocalCountry>
+    <LocalBank>BMF</LocalBank>
+    <DepositTransactionExpirationCheckPeriodMinutes>10</DepositTransactionExpirationCheckPeriodMinutes>
+    <HostOffLineStartTime>18:00:00</HostOffLineStartTime>
+    <HostOffLineEndTime>19:00:00</HostOffLineEndTime>
+    <CheckForUncertainWithdrawalFlag>1</CheckForUncertainWithdrawalFlag>
+    <UnCertainActionReason>UnCertain</UnCertainActionReason>
+    <DepositorMustRegister>1</DepositorMustRegister>
+    <BeneficiaryMustRegister>1</BeneficiaryMustRegister>
+    <!-- Check Beneficiary Registration during deposit phase 1 -->
+    <!-- Check Beneficiary Registration during withdrawal phase 2 -->
+    <WhenCheckBeneficiaryRegisteration>1</WhenCheckBeneficiaryRegisteration>
+    <UseBeneficiaryAsId>1</UseBeneficiaryAsId>
+    <UseAmountAsDPIN>0</UseAmountAsDPIN>
+    <ApplyLimitsOnBeneficiary>0</ApplyLimitsOnBeneficiary>
+    <checkAmount>0</checkAmount>
+    <LowestDenom>5</LowestDenom>
+  </BusinessRules>
   <Database>
     <DataSource>.</DataSource>
     <InitialCatalog>BMRem</InitialCatalog>

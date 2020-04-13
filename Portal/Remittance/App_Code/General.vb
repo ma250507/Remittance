@@ -268,4 +268,31 @@ Public Class General
         Catch ex As Exception
         End Try
     End Sub
+
+    Public Function GetBulkWithdrowalTransactionsReport(ByVal StartDate As DateTime, ByVal EndDate As DateTime, ByVal ConnectionString As String, ByRef DT As DataTable) As Boolean
+        Dim ConnectionStr As String = ConnectionString  'ConnStrConfig
+        Dim myConnection As SqlConnection
+        Dim myCommand As SqlCommand
+        Dim myAdapter As SqlDataAdapter
+        Try
+            myConnection = New SqlConnection(ConnectionStr)
+            myCommand = New SqlCommand
+            myConnection.Open()
+            DT = New DataTable
+            myCommand.Connection = myConnection
+            myCommand.CommandText = "TransactionBalanceStatment"
+            myCommand.CommandType = CommandType.Text
+
+            myAdapter = New SqlDataAdapter()
+            myAdapter.SelectCommand = myCommand
+            myAdapter.Fill(DT)
+            myConnection.Close()
+            Return True
+
+            Return True
+        Catch ex As Exception
+            Return False
+
+        End Try
+    End Function
 End Class

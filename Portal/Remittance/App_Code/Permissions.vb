@@ -8,4 +8,5 @@ Public Class Permissions
     Public Users As String = ""
     Public Register As String = ""
     Public GroupName As String = ""
+    Public BulkTransactionsReports As String = ""
 End Class

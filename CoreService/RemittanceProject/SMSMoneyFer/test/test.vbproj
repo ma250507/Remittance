@@ -135,10 +135,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NCR.EG.Remittance.BulkUploader\NCR.EG.Remittance.BulkUploader.csproj">
-      <Project>{fd1efbab-e94b-4ed0-9d71-04647c0025a0}</Project>
-      <Name>NCR.EG.Remittance.BulkUploader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NCRMoneyFerCustomerAlertService\CustomerAlertService\NCRMoneyFerCustomerAlertService.vbproj">
       <Project>{5638B380-F731-473C-ADDE-68C6367102AB}</Project>
       <Name>NCRMoneyFerCustomerAlertService</Name>

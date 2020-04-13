@@ -1,4 +1,4 @@
-﻿<%@ Page Language="VB" AutoEventWireup="false" CodeFile="TransBalanceRPTView.aspx.vb" Inherits="TransBalanceRPTView" %>
+﻿<%@ Page Language="VB" AutoEventWireup="false" CodeFile="BulkWithdrowalTransactionsView.aspx.vb" Inherits="BulkWithdrowalTransactionsView" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ Register assembly="CrystalDecisions.Web, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" namespace="CrystalDecisions.Web" tagprefix="CR" %>

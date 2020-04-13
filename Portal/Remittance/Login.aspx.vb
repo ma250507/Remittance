@@ -124,8 +124,8 @@ Partial Class Login
                     Con.Open()
                     Com.Connection = Con
                     Gen_Comm.Connection = Con
-                    Gen_Comm.CommandText = "select Reports,Maintenance,Administration,Users,Name,Teller,Registeration " & _
-                                           "from Groups " & _
+                    Gen_Comm.CommandText = "select Reports,Maintenance,Administration,Users,Name,Teller,Registeration,BulkTransactionsReports " &
+                                           "from Groups " &
                                            "where Name='" & Group(4).ToString() & "' "
                     dread = Gen_Comm.ExecuteReader()
                     While (dread.Read())
@@ -136,6 +136,7 @@ Partial Class Login
                         Perm.GroupName = dread(4).ToString()
                         Perm.Teller = dread(5).ToString()
                         Perm.Register = dread(6).ToString()
+                        Perm.BulkTransactionsReports = dread(7).ToString()
                     End While
                     dread.Close()
                     Con.Close()
@@ -338,8 +339,8 @@ Partial Class Login
                 Session.Add("Status", Valid)
                 dread.Close()
 
-                Gen_Comm.CommandText = "select Reports,Maintenance,Administration,Users,Name,Teller,Registeration " & _
-                                       "from Groups " & _
+                Gen_Comm.CommandText = "select Reports,Maintenance,Administration,Users,Name,Teller,Registeration,BulkTransactionsReports " &
+                                       "from Groups " &
                                        "where ID='" & GroupID & "' "
                 dread = Gen_Comm.ExecuteReader()
                 While (dread.Read())
@@ -350,6 +351,7 @@ Partial Class Login
                     Perm.GroupName = dread(4).ToString()
                     Perm.Teller = dread(5).ToString()
                     Perm.Register = dread(6).ToString()
+                    Perm.BulkTransactionsReports = dread(7).ToString()
                 End While
                 dread.Close()
 

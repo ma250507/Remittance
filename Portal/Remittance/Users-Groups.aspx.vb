@@ -15,7 +15,7 @@ Partial Class Users_Groups
         Dim Users As CheckBox = (DirectCast(GridView2.FooterRow.FindControl("CB_Users"), CheckBox))
         Dim Teller As CheckBox = (DirectCast(GridView2.FooterRow.FindControl("CB_Teller"), CheckBox))
         Dim Register As CheckBox = (DirectCast(GridView2.FooterRow.FindControl("CB_Registeration"), CheckBox))
-
+        Dim BulkTransactionsReports As CheckBox = (DirectCast(GridView2.FooterRow.FindControl("CB_BulkTransactionsReports"), CheckBox))
         Dim ret As Integer = 0
 
         NcrCrypt = New NCRCrypto()
@@ -34,7 +34,7 @@ Partial Class Users_Groups
         'SqlDataSource2.InsertParameters("Administration").DefaultValue = Administration.Checked
         'SqlDataSource2.InsertParameters("Registeration").DefaultValue = Register.Checked
 
-        SqlDataSource2.InsertCommand = "INSERT INTO [Groups] ([ID], [Name], [Reports], [Maintenance], [Administration], [Users], [Teller], [Registeration] ) VALUES (" & ID & ",'" & Name & "'," & Convert.ToInt32(Reports.Checked) & ", " & Convert.ToInt32(Maintenance.Checked) & ", " & Convert.ToInt32(Administration.Checked) & ", " & Convert.ToInt32(Users.Checked) & ", " & Convert.ToInt32(Teller.Checked) & "," & Convert.ToInt32(Register.Checked) & ")"
+        SqlDataSource2.InsertCommand = "INSERT INTO [Groups] ([ID], [Name], [Reports], [Maintenance], [Administration], [Users], [Teller], [Registeration],[BulkTransactionsReports] ) VALUES (" & ID & ",'" & Name & "'," & Convert.ToInt32(Reports.Checked) & ", " & Convert.ToInt32(Maintenance.Checked) & ", " & Convert.ToInt32(Administration.Checked) & ", " & Convert.ToInt32(Users.Checked) & ", " & Convert.ToInt32(Teller.Checked) & "," & Convert.ToInt32(Register.Checked) & "," & Convert.ToInt32(BulkTransactionsReports.Checked) & ")"
 
         Try
             SqlDataSource2.Insert()
@@ -54,7 +54,7 @@ Partial Class Users_Groups
         Dim Users As CheckBox = (DirectCast(GridView2.Rows(e.RowIndex).FindControl("CheckBox4"), CheckBox))
         Dim Teller As CheckBox = (DirectCast(GridView2.Rows(e.RowIndex).FindControl("CheckBox6"), CheckBox))
         Dim Register As CheckBox = (DirectCast(GridView2.Rows(e.RowIndex).FindControl("CheckBox8"), CheckBox))
-
+        Dim BulkTransactionsReports As CheckBox = (DirectCast(GridView2.Rows(e.RowIndex).FindControl("cb_BulkTransactionsReports_Edit"), CheckBox))
 
         'SqlDataSource2.UpdateParameters("original_ID").DefaultValue = ID
         'SqlDataSource2.UpdateParameters("Name").DefaultValue = Name
@@ -65,8 +65,8 @@ Partial Class Users_Groups
         'SqlDataSource2.UpdateParameters("Administration").DefaultValue = CType(, Integer)
         'SqlDataSource2.UpdateParameters("Registeration").DefaultValue = CType(, Integer)
 
-        SqlDataSource2.UpdateCommand = "UPDATE [Groups] SET [Name] = '" & Name & "', [Reports] = " & Convert.ToInt32(Reports.Checked) & ", [Maintenance] = " & Convert.ToInt32(Maintenance.Checked) & ", [Administration] = " & Convert.ToInt32(Administration.Checked) & "" & _
-                                       " , [Users] = " & Convert.ToInt32(Users.Checked) & ", [Teller] = " & Convert.ToInt32(Teller.Checked) & " , [Registeration] = " & Convert.ToInt32(Register.Checked) & " WHERE [ID] = " & ID & ""
+        SqlDataSource2.UpdateCommand = "UPDATE [Groups] SET [Name] = '" & Name & "', [Reports] = " & Convert.ToInt32(Reports.Checked) & ", [Maintenance] = " & Convert.ToInt32(Maintenance.Checked) & ", [Administration] = " & Convert.ToInt32(Administration.Checked) & "" &
+                                       " , [Users] = " & Convert.ToInt32(Users.Checked) & ", [Teller] = " & Convert.ToInt32(Teller.Checked) & " , [Registeration] = " & Convert.ToInt32(Register.Checked) & " , [BulkTransactionsReports] = " & Convert.ToInt32(BulkTransactionsReports.Checked) & " WHERE [ID] = " & ID & ""
 
         Try
 
