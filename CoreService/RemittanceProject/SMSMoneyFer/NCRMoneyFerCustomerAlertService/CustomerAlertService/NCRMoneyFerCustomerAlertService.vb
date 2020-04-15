@@ -77,7 +77,11 @@ Public Class NCRMoneyFerCustomerAlertService
     Public Shared SMSHTTPUNIBank_ClientSecret As String
     Public Shared SMSHTTPUNIBank_RegisteredDelivery As String
 
-
+    Public Shared SMSUserName As String
+    Public Shared SMSPassword As String
+    Public Shared URL As String
+    Public Shared KEY As String
+    Public Shared SenderName As String
 
     Private chktrxc As CheckTransactionsClass
 
@@ -518,7 +522,39 @@ Public Class NCRMoneyFerCustomerAlertService
             loglog("Error Reading UniBank HTTP settings ex:" & ex.Message, True)
         End Try
 
+        Try
+            items = Nothing
+            item = Nothing
+            items = xmlD.GetElementsByTagName("SMSHTTPBM")
+            item = items(0)
+            If Not item Is Nothing Then
 
+                For Each tmpItem In item.ChildNodes
+
+
+                    If tmpItem.Name.ToUpper() = "URL".ToUpper() Then
+                        URL = tmpItem.InnerText
+                    End If
+
+                    If tmpItem.Name.ToUpper() = "SMSUserName".ToUpper() Then
+                        SMSUserName = tmpItem.InnerText
+                    End If
+                    If tmpItem.Name.ToUpper() = "SMSPassword".ToUpper() Then
+                        SMSPassword = tmpItem.InnerText
+                    End If
+
+                    If tmpItem.Name.ToUpper() = "KEY".ToUpper() Then
+                        KEY = tmpItem.InnerText
+                    End If
+                    If tmpItem.Name.ToUpper() = "SenderName".ToUpper() Then
+                        SenderName = tmpItem.InnerText
+                    End If
+
+                Next
+            End If
+        Catch ex As Exception
+            loglog("Error Reading BM HTTP settings ex:" & ex.Message, True)
+        End Try
 
         items = Nothing
         item = Nothing

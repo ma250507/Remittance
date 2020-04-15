@@ -140,10 +140,11 @@ Partial Class Login
                     End While
                     dread.Close()
                     Con.Close()
-
+                    MainFun.loglog("TellerIPAddress: " & TellerIPAddress & " --ClientIP: " & ClientIP, True)
                     If (Perm.Maintenance = "True" Or Perm.Teller = "True") Then
                         If (Perm.Teller = "True") Then
                             Try
+
                                 If (TellerIPAddress.Substring(0, TellerIPAddress.LastIndexOf(".")) <> ClientIP.Substring(0, ClientIP.LastIndexOf("."))) Then
                                     lbl_Error.Text = "Sorry you can not login please refer to the security officer."
                                     lbl_Error.Visible = True
@@ -354,7 +355,7 @@ Partial Class Login
                     Perm.BulkTransactionsReports = dread(7).ToString()
                 End While
                 dread.Close()
-
+                MainFun.loglog("TellerIPAddress: " & TellerIPAddress & " --ClientIP: " & ClientIP, True)
                 If (Perm.Maintenance = "True" Or Perm.Teller = "True") Then
                     If (Perm.Teller = "True") Then
                         Try

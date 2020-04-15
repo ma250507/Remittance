@@ -1,4 +1,8 @@
 'MODEM IMPORTS ================
+Imports System.IO
+Imports System.Net
+Imports System.Security.Cryptography
+Imports System.Text
 Imports GsmComm.GsmCommunication
 Imports GsmComm.PduConverter
 ''===============================
@@ -55,7 +59,7 @@ Public Class SMSSendingClass
             Case 4
                 rtrn = SendSMS_CIB(MSGTEXT, RecepientMobile, SendingStatus)
             Case 5
-                rtrn = SendSMS_BanqueMisr(MSGTEXT, RecepientMobile, SendingStatus)
+                rtrn = SendSMS_BanqueMisr_New(MSGTEXT, RecepientMobile, SendingStatus)
             Case 6
                 rtrn = SendSMS_UniBank(MSGTEXT, RecepientMobile, SendingStatus)
             Case Else
@@ -63,7 +67,7 @@ Public Class SMSSendingClass
                 rtrn = 9
         End Select
         Return rtrn
-      
+
     End Function
 
     Public Function SendSMS_Modem(ByVal Provider As String, ByVal Type As String, ByVal MSGTEXT As String, ByVal SenderMobile As String, ByVal RecepientMobile As String, ByVal Binary As String, ByVal PTimeOut As Integer, ByRef MsgId As String, ByRef SendingStatus As String) As Integer
@@ -132,7 +136,7 @@ Public Class SMSSendingClass
             Return ""
         End Try
     End Function
-    
+
     Public Function SendSMSUB(ByVal Provider As String, ByVal Type As String, ByVal MSGTEXT As String, ByVal SenderMobile As String, ByVal RecepientMobile As String, ByVal Binary As String, ByVal TimeOut As Integer, ByRef MsgId As String, ByRef SendingStatus As String) As Integer
         Dim finalURL As String
         Dim ts As Date
@@ -396,7 +400,7 @@ Public Class SMSSendingClass
             raffected = cm.ExecuteNonQuery()
             NCRMoneyFerCustomerAlertService.loglog("SendSMS_CIB,rows affected=[" & raffected & "] for updating trx q=[" & q & "]", False)
 
-            
+
             Try
                 c.Close()
             Catch ex As Exception
@@ -426,6 +430,79 @@ Public Class SMSSendingClass
 
     End Function
 
+    Public Function SendSMS_BanqueMisr_New(ByVal MSGTEXT As String, ByVal RecepientMobile As String, ByRef SendingStatus As String) As Integer
+        Dim client As New Net.WebClient
+        Dim MsgSTR As String
+        Dim URLStr As String
+        Dim STR As String
+        Try
+            MsgSTR = MSGTEXT.Replace(" ", "%20")
+            MsgSTR = MsgSTR.Replace("&", "%26")
+            MsgSTR = PrepareString(MsgSTR, RecepientMobile)
+            Dim request As WebRequest = WebRequest.Create(NCRMoneyFerCustomerAlertService.URL)
+            request.Method = "POST"
+            Dim byteArray As Byte() = Encoding.UTF8.GetBytes(MSGTEXT)
+            request.ContentType = "application/xml"
+
+            request.ContentLength = byteArray.Length
+            Dim dataStream As Stream = request.GetRequestStream()
+            dataStream.Write(byteArray, 0, byteArray.Length)
+            dataStream.Close()
+            Dim response As WebResponse = request.GetResponse()
+            dataStream = response.GetResponseStream()
+            Dim reader As StreamReader = New StreamReader(dataStream)
+            Dim responseFromServer As String = reader.ReadToEnd()
+            reader.Close()
+            dataStream.Close()
+            response.Close()
+            NCRMoneyFerCustomerAlertService.loglog("SMS GW response " + responseFromServer, True)
+            SendingStatus = 4
+            Return 0
+        Catch ex As Exception
+            NCRMoneyFerCustomerAlertService.loglog("SEND BanqueMisr error ex =" & ex.ToString, True)
+            Return 9
+        End Try
+
+
+    End Function
+
+
+    Private Function PrepareString(Msg As String, Mob As String) As String
+        Dim data As StringBuilder = New StringBuilder()
+        data.AppendLine("<?xml version=""1.0"" encoding=""UTF-8""?>")
+        data.AppendLine("<SubmitSMSRequest xmlns:=""http://www.edafa.com/web2sms/sms/model/"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema instance"" xsi:schemaLocation=""http://www.edafa.com/web2sms/sms/model/ SMSAPI.xsd "" xsi:type=""SubmitSMSRequest"">")
+        data.AppendLine(String.Format("<AccountId>{0}</AccountId>", NCRMoneyFerCustomerAlertService.SMSUserName))
+        data.AppendLine(String.Format("<Password>{0}</Password>", NCRMoneyFerCustomerAlertService.SMSPassword))
+        Dim StringToHash As String = String.Format("AccountId={0}&Password={1}&SenderName={2}&ReceiverMSISDN={3}&SMSText={4}", NCRMoneyFerCustomerAlertService.SMSUserName, NCRMoneyFerCustomerAlertService.SMSPassword, NCRMoneyFerCustomerAlertService.SenderName, Mob, Msg)
+        data.AppendLine(String.Format("<SecureHash>{0}</SecureHash>", HashString(StringToHash)))
+        data.AppendLine("<SMSList>")
+        data.AppendLine(String.Format("<SenderName>{0}</SenderName>", NCRMoneyFerCustomerAlertService.SenderName))
+        data.AppendLine(String.Format("<ReceiverMSISDN>{0}</ReceiverMSISDN>", Mob))
+        data.AppendLine(String.Format("<SMSText>{0}</SMSText>", Msg))
+        data.AppendLine("</SMSList>")
+        data.AppendLine("</SubmitSMSRequest>")
+        NCRMoneyFerCustomerAlertService.loglog("XML Request: " & data.ToString(), True)
+        Return data.ToString()
+    End Function
+    Public Shared Function HashString(ByVal StringToHash As String) As String
+        Dim encoding As System.Text.ASCIIEncoding = New System.Text.ASCIIEncoding()
+        Dim keyByte As Byte() = encoding.GetBytes(NCRMoneyFerCustomerAlertService.KEY)
+        Dim hmacmd5 As HMACSHA256 = New HMACSHA256(keyByte)
+        ' Dim hmacsha1 As HMACSHA1 = New HMACSHA1(keyByte)
+        Dim messageBytes As Byte() = encoding.GetBytes(StringToHash)
+        Dim hashmessage As Byte() = hmacmd5.ComputeHash(messageBytes)
+
+        Return ByteToString(hashmessage)
+    End Function
+    Public Shared Function ByteToString(ByVal buff As Byte()) As String
+        Dim sbinary As String = ""
+
+        For i As Integer = 0 To buff.Length - 1
+            sbinary += buff(i).ToString("X2")
+        Next
+
+        Return (sbinary)
+    End Function
     Public Function SendSMS_BanqueMisr(ByVal MSGTEXT As String, ByVal RecepientMobile As String, ByRef SendingStatus As String) As Integer
         Dim client As New Net.WebClient
         Dim MsgSTR As String
@@ -444,7 +521,7 @@ Public Class SMSSendingClass
             NCRMoneyFerCustomerAlertService.loglog("SEND BanqueMisr error ex =" & ex.ToString, True)
             Return 9
         End Try
-        
+
 
     End Function
     Public Function SendSMS_UniBank(ByVal MSGTEXT As String, ByVal RecepientMobile As String, ByRef SendingStatus As String) As Integer

@@ -82,4 +82,11 @@
 		<ClientSecret>lxtexakf</ClientSecret>
 		<RegisteredDelivery>true</RegisteredDelivery>
 	</SMSHTTPUNIBank>
+  <SMSHTTPBM>
+    <SMSUserName>101003172</SMSUserName>
+    <SMSPassword>Vodafone1</SMSPassword>
+    <URL>https://e3len.vodafone.com.eg/web2sms/sms/submit/</URL>
+    <KEY>A62836DF266746CC8441FB8DED6C812F</KEY>
+    <SenderName>Banque Misr</SenderName>
+  </SMSHTTPBM>
 </Config>

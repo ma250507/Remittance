@@ -19,9 +19,9 @@ Partial Class Reports
     Public Connection As String = ConfigurationManager.ConnectionStrings("NCRMoneyFerConnection").ConnectionString
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        'If (Session("Status") = "InValid_user" Or Session("Status") = Nothing) Then
-        '    Response.Redirect("Login.aspx")
-        'End If
+        If (Session("Status") = "InValid_user" Or Session("Status") = Nothing) Then
+            Response.Redirect("Login.aspx")
+        End If
         If (IsPostBack <> True) Then
             'Try
             '    UserPerm = New Permissions()

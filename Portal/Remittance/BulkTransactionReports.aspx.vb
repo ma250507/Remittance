@@ -382,11 +382,7 @@ Partial Class BulkTransactionReports
         Dim cmd As String = ""
         Dim WhereSTR As String = ""
         State = New StateObj
-        If (drpd_ATM.SelectedItem.Text = "ALL") Then
-            ATMstr = "%"
-        Else
-            ATMstr = drpd_ATM.SelectedItem.ToString()
-        End If
+
 
         If drpdl_Wstatus.SelectedItem.Text.ToLower = "New".ToLower Then
             cmd = "SELECT T.Amount,t.BeneficiaryName,t.NationalID,t.TransactionCode,t.TransactionDateTime,r.RemitterName " &
@@ -400,6 +396,7 @@ Partial Class BulkTransactionReports
                 " On t.ATMId = a.ATMId " &
                 " left outer join Remitters r" &
                 " on r.ID=t.RemitterID "
+
         End If
 
         Select Case drpdl_Wstatus.SelectedItem.Text
@@ -418,11 +415,11 @@ Partial Class BulkTransactionReports
 
         Select Case Drpd_Amount.SelectedItem.Text
             Case "Equal"
-                WhereSTR = WhereSTR & "Amount ='" & TXT_AMT.Text & "'  and "
+                WhereSTR = WhereSTR & "Amount =" & TXT_AMT.Text & "  and "
             Case "Less Than"
-                WhereSTR = WhereSTR & "Amount <'" & TXT_AMT.Text & "' and "
+                WhereSTR = WhereSTR & "Amount <" & TXT_AMT.Text & " and "
             Case "Larger Than"
-                WhereSTR = WhereSTR & "Amount >'" & TXT_AMT.Text & "' and "
+                WhereSTR = WhereSTR & "Amount >" & TXT_AMT.Text & " and "
             Case Else
 
         End Select
@@ -442,13 +439,13 @@ Partial Class BulkTransactionReports
 
         Select Case drpd_TRXSeq.SelectedItem.Text
             Case "Starts With"
-                WhereSTR = WhereSTR & "T.ATMTrxSequence like '" & txt_TRXSeq.Text & "%' and "
+                WhereSTR = WhereSTR & "T.ATMTransactionSequence like '" & txt_TRXSeq.Text & "%' and "
             Case "Part Of"
-                WhereSTR = WhereSTR & "T.ATMTrxSequence like '%" & txt_TRXSeq.Text & "%' and "
+                WhereSTR = WhereSTR & "T.ATMTransactionSequence like '%" & txt_TRXSeq.Text & "%' and "
             Case "Ends With"
-                WhereSTR = WhereSTR & "T.ATMTrxSequence like '%" & txt_TRXSeq.Text & "' and "
+                WhereSTR = WhereSTR & "T.ATMTransactionSequence like '%" & txt_TRXSeq.Text & "' and "
             Case "Exact"
-                WhereSTR = WhereSTR & "T.ATMTrxSequence = '" & txt_TRXSeq.Text & "' and "
+                WhereSTR = WhereSTR & "T.ATMTransactionSequence = '" & txt_TRXSeq.Text & "' and "
             Case Else
 
         End Select
@@ -479,14 +476,15 @@ Partial Class BulkTransactionReports
                 WhereSTR = " Where " & str
             End If
 
-            If WhereSTR.Trim().EndsWith("and") Then
-                WhereSTR = ReplaceLastOccurrence(WhereSTR.Trim, "and", "")
+            Dim query = cmd & WhereSTR
+            If query.Trim().EndsWith("and") Then
+                query = ReplaceLastOccurrence(query.Trim, "and", "")
             End If
-
+            MainFun.loglog("query:" & query, True)
             State.ReportName = "Reports\NewBulkTransactions.rpt"
             State.Hasdetails = False
             State.DetailsQuery = ""
-            State.QueryString = cmd & WhereSTR
+            State.QueryString = query
             State.DFrom = StrFrom
             State.DTo = Strto
             State.Title = "New Bulk Transactions"
@@ -495,6 +493,13 @@ Partial Class BulkTransactionReports
             Response.Redirect("NewBulkTransactionsReport.aspx")
 
         ElseIf drpdl_Wstatus.SelectedItem.Text.ToLower = "expired".ToLower Then
+
+            If (drpd_ATM.SelectedItem.Text = "ALL") Then
+                ATMstr = " t.ATMId like '%'"
+            Else
+                ATMstr = " t.ATMId = '" & drpd_ATM.SelectedItem.ToString() & "'"
+            End If
+
             If (DPC_date1.Value = "" Or DPC_date2.Value = "") Then
                 Lbl_Status.Text = "Please select a time frame"
                 Lbl_Status.Visible = True
@@ -502,26 +507,36 @@ Partial Class BulkTransactionReports
             Else
                 StrFrom = DPC_date1.Value & " " & drpd_FRM_HH.SelectedItem.ToString() & ":" & drpd_FRM_MM.SelectedItem.ToString()
                 Strto = DPC_date2.Value & " " & drpd_TO_HH.SelectedItem.ToString() & ":" & drpd_TO_MM.SelectedItem.ToString()
-                WhereSTR = WhereSTR & " WithdrawalDateTime between '" & StrFrom & "' and '" & Strto & "'"
+                WhereSTR = WhereSTR & " WithdrawalDateTime between '" & StrFrom & "' and '" & Strto & "' and"
             End If
             If Not String.IsNullOrEmpty(WhereSTR.Trim) Then
-                WhereSTR = " Where " & WhereSTR
+                WhereSTR = " Where " & WhereSTR & ATMstr
 
             End If
-            If WhereSTR.Trim().EndsWith("and") Then
-                WhereSTR = ReplaceLastOccurrence(WhereSTR.Trim, "and", "")
+            Dim query = cmd & WhereSTR
+            If query.Trim().EndsWith("and") Then
+                query = ReplaceLastOccurrence(query.Trim, "and", "")
             End If
+
+            MainFun.loglog("query:" & query, True)
             State.ReportName = "Reports\ExpiredTransactions.rpt"
             State.Hasdetails = False
             State.DetailsQuery = ""
-            State.QueryString = cmd & WhereSTR
+            State.QueryString = query
             State.DFrom = StrFrom
             State.DTo = Strto
             State.Title = "Expired Bulk Transactions"
             State.ATM = ""
             Session.Add("Obj", State)
             Response.Redirect("BulkExpiredTransactionsView.aspx")
-        Else
+
+        ElseIf drpdl_Wstatus.SelectedItem.Text.ToLower = "all".ToLower Then
+
+            If (drpd_ATM.SelectedItem.Text = "ALL") Then
+                ATMstr = " ( t.ATMId is null or t.ATMId like '%') "
+            Else
+                ATMstr = " ( t.ATMId is null or t.ATMId = '" & drpd_ATM.SelectedItem.ToString() & "')"
+            End If
 
             If (DPC_date1.Value = "" Or DPC_date2.Value = "") Then
                 Lbl_Status.Text = "Please select a time frame"
@@ -530,21 +545,62 @@ Partial Class BulkTransactionReports
             Else
                 StrFrom = DPC_date1.Value & " " & drpd_FRM_HH.SelectedItem.ToString() & ":" & drpd_FRM_MM.SelectedItem.ToString()
                 Strto = DPC_date2.Value & " " & drpd_TO_HH.SelectedItem.ToString() & ":" & drpd_TO_MM.SelectedItem.ToString()
-                WhereSTR = WhereSTR & " WithdrawalDateTime between '" & StrFrom & "' and '" & Strto & "'"
+                WhereSTR = WhereSTR & " (WithdrawalDateTime is null or ( WithdrawalDateTime between '" & StrFrom & "' and '" & Strto & "')) and"
             End If
             If Not String.IsNullOrEmpty(WhereSTR.Trim) Then
                 WhereSTR = " Where " & WhereSTR
 
             End If
-            If WhereSTR.Trim().EndsWith("and") Then
-                WhereSTR = ReplaceLastOccurrence(WhereSTR.Trim, "and", "")
+
+            Dim query = cmd & WhereSTR & ATMstr
+            If query.Trim().EndsWith("and") Then
+                query = ReplaceLastOccurrence(query.Trim, "and", "")
             End If
+            MainFun.loglog("query:" & query, True)
             State.ReportName = "Reports\BulkTransactions.rpt"
             State.Hasdetails = False
             State.DetailsQuery = ""
-            State.QueryString = cmd & WhereSTR
+            State.QueryString = query
             State.DFrom = StrFrom
             State.DTo = Strto
+            State.Title = "Bulk Transactions Report"
+            State.ATM = ""
+            Session.Add("Obj", State)
+            Response.Redirect("BulkWithdrowalTransactionsView.aspx")
+
+            Else
+
+            If (drpd_ATM.SelectedItem.Text = "ALL") Then
+                ATMstr = " t.ATMId like '%'"
+            Else
+                ATMstr = " t.ATMId = '" & drpd_ATM.SelectedItem.ToString() & "'"
+            End If
+
+            If (DPC_date1.Value = "" Or DPC_date2.Value = "") Then
+                Lbl_Status.Text = "Please select a time frame"
+                Lbl_Status.Visible = True
+                Return
+            Else
+                StrFrom = DPC_date1.Value & " " & drpd_FRM_HH.SelectedItem.ToString() & ":" & drpd_FRM_MM.SelectedItem.ToString()
+                Strto = DPC_date2.Value & " " & drpd_TO_HH.SelectedItem.ToString() & ":" & drpd_TO_MM.SelectedItem.ToString()
+                WhereSTR = WhereSTR & " WithdrawalDateTime between '" & StrFrom & "' and '" & Strto & "' and"
+            End If
+            If Not String.IsNullOrEmpty(WhereSTR.Trim) Then
+                WhereSTR = " Where " & WhereSTR
+
+            End If
+
+            Dim query = cmd & WhereSTR & ATMstr
+            If query.Trim().EndsWith("and") Then
+                query = ReplaceLastOccurrence(query.Trim, "and", "")
+            End If
+            MainFun.loglog("query:" & query, True)
+            State.ReportName = "Reports\BulkTransactions.rpt"
+            State.Hasdetails = False
+            State.DetailsQuery = ""
+            State.QueryString = query
+            State.DFrom = StrFrom
+        State.DTo = Strto
             State.Title = "Bulk Transactions Report"
             State.ATM = ""
             Session.Add("Obj", State)
