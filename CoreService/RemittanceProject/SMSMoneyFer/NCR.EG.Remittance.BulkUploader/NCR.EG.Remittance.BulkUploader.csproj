@@ -35,6 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="NCR.EG.Utilities, Version=1.2.0.0, Culture=neutral, PublicKeyToken=1874e8dc8e88b92b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\NCR.EG.Utilities.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
@@ -71,12 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\NCR.EG.Utilities\NCR.EG.License\NCR.EG.Utilities.vbproj">
-      <Project>{2b0f35c8-9935-4943-83d4-f9c99b6659c9}</Project>
-      <Name>NCR.EG.Utilities</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">
