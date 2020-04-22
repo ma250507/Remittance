@@ -23,6 +23,12 @@ namespace NCR.EG.Remittance.BulkUploader
 
         public void MyStart()
         {
+
+            if(ConfigClass.ReadConfig() != ConstantsClass.OK)
+            {
+                OnStop();
+            }
+
             record = new BulkFileRecord();
             record.FieldsCount = 5;
             record.MobileNumberIndex = 0;
