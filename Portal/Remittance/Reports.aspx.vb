@@ -19,9 +19,9 @@ Partial Class Reports
     Public Connection As String = ConfigurationManager.ConnectionStrings("NCRMoneyFerConnection").ConnectionString
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        'If (Session("Status") = "InValid_user" Or Session("Status") = Nothing) Then
-        '    Response.Redirect("Login.aspx")
-        'End If
+        If (Session("Status") = "InValid_user" Or Session("Status") = Nothing) Then
+            Response.Redirect("Login.aspx")
+        End If
         If (IsPostBack <> True) Then
             'Try
             '    UserPerm = New Permissions()
@@ -574,9 +574,9 @@ Partial Class Reports
                 State.ReportName = "Reports\Blocked.rpt"
                 State.Hasdetails = True
                 State.DetailsQuery = " Select * from TransactionNestedActions "
-                State.QueryString = "select T.*,(select RequestTypeDescription from requesttype where RequestTypeCode=T.RequestType)as RequestType,ATM.ATMName,TN.CommissionAmount,TN.DispensedAmount" & _
-                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " & _
-                                    " where T.atmid like '" & selected_ATM & "' and T.depositstatus='CONFIRMED' and T.withdrawalstatus='AUTHORIZED' and TN.[action]='02'and TN.actionstatus='AUTHORIZED' and  " & _
+                State.QueryString = "select T.*,(select RequestTypeDescription from requesttype where RequestTypeCode=T.RequestType)as RequestType,ATM.ATMName,TN.CommissionAmount,TN.DispensedAmount" &
+                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " &
+                                    " where T.atmid like '" & selected_ATM & "' and T.depositstatus='CONFIRMED' and T.withdrawalstatus='AUTHORIZED' and TN.[action]='02'and TN.actionstatus='AUTHORIZED' and  " &
                                     " DATEDIFF(minute,T.depositdatetime,getdate()) > 15 "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -588,8 +588,8 @@ Partial Class Reports
                 State.ReportName = "Reports\CWithdrawals.rpt"
                 State.Hasdetails = True
                 State.DetailsQuery = " Select * from TransactionNestedActions "
-                State.QueryString = "SELECT T.transactioncode,Tn.atmid,T.DepositorMobile,T.BeneficiaryMobile,T.Amount,T.SMSSendingStatus,T.SMSSentDateTime, ATM.ATMName,T.DepositDateTime,T.WithdrawalDateTime, TN.DispensedAmount" & _
-                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " & _
+                State.QueryString = "SELECT T.transactioncode,Tn.atmid,T.DepositorMobile,T.BeneficiaryMobile,T.Amount,T.SMSSendingStatus,T.SMSSentDateTime, ATM.ATMName,T.DepositDateTime,T.WithdrawalDateTime, TN.DispensedAmount" &
+                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " &
                                      " where withdrawalstatus ='CONFIRMED' and tn.ActionStatus = 'CONFIRMED' and  TN.[action]='12'and TN.actionstatus='CONFIRMED' and Tn.atmid like '" & selected_ATM & "' and TN.ActionDateTime between '" & StrFrom & "' and '" & Strto & "' "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -606,8 +606,8 @@ Partial Class Reports
                 '                    " where T.depositstatus='EXPIRED' and T.withdrawalstatus='CONFIRMED'   and TN.[action]='17'and TN.actionstatus='CONFIRMED' and T.atmid like '" & selected_ATM & "' and TN.ActionDatetime between '" & StrFrom & "' and '" & Strto & "' "
 
 
-                State.QueryString = "SELECT T.transactioncode,Tn.atmid,T.DepositorMobile,T.BeneficiaryMobile,T.Amount,T.SMSSendingStatus,T.SMSSentDateTime, ATM.ATMName,T.DepositDateTime,T.WithdrawalDateTime, TN.DispensedAmount" & _
-                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " & _
+                State.QueryString = "SELECT T.transactioncode,Tn.atmid,T.DepositorMobile,T.BeneficiaryMobile,T.Amount,T.SMSSendingStatus,T.SMSSentDateTime, ATM.ATMName,T.DepositDateTime,T.WithdrawalDateTime, TN.DispensedAmount" &
+                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " &
                                     " where T.depositstatus='EXPIRED' and T.withdrawalstatus='CONFIRMED'   and TN.[action]='17'and TN.actionstatus='CONFIRMED' and T.atmid like '" & selected_ATM & "' and TN.ActionDatetime between '" & StrFrom & "' and '" & Strto & "' "
 
 
@@ -619,8 +619,8 @@ Partial Class Reports
                 Response.Redirect("FinalRPT.aspx")
             ElseIf (drpd_RPT_Type.SelectedValue = 4) Then 'Expired
                 State.ReportName = "Reports\Expired.rpt"
-                State.QueryString = "select T.*,ATM.ATMName" & _
-                                    " FROM Transactions T inner join ATM ON T.CountryCode = ATM.CountryCode AND T.BankCode = ATM.BankCode AND T.ATMId = ATM.ATMId  " & _
+                State.QueryString = "select T.*,ATM.ATMName" &
+                                    " FROM Transactions T inner join ATM ON T.CountryCode = ATM.CountryCode AND T.BankCode = ATM.BankCode AND T.ATMId = ATM.ATMId  " &
                                     " where T.atmid like '" & selected_ATM & "' and T.depositstatus='EXPIRED' and T.withdrawalstatus='EXPIRED' and  T.depositdatetime between '" & StrFrom & "' and '" & Strto & "' "
                 State.Hasdetails = True
                 State.DetailsQuery = " Select * from TransactionNestedActions "
@@ -655,10 +655,10 @@ Partial Class Reports
                 Response.Redirect("RPT.aspx?9")
             ElseIf (drpd_RPT_Type.SelectedValue = 10) Then
                 State.ReportName = "Reports\w30000.rpt"
-                State.QueryString = "select BeneficiaryMobile,sum(Amount) as Test" & _
-                                    " from transactions " & _
-                                    " where  depositdatetime between '" & StrFrom & "' and '" & Strto & "' " & _
-                                    " group by BeneficiaryMobile " & _
+                State.QueryString = "select BeneficiaryMobile,sum(Amount) as Test" &
+                                    " from transactions " &
+                                    " where  depositdatetime between '" & StrFrom & "' and '" & Strto & "' " &
+                                    " group by BeneficiaryMobile " &
                                     " having sum(Amount) > 30000 "
 
                 State.DFrom = StrFrom
@@ -669,10 +669,10 @@ Partial Class Reports
                 Response.Redirect("FinalRPT.aspx")
             ElseIf (drpd_RPT_Type.SelectedValue = 11) Then
                 State.ReportName = "Reports\Dep30000.rpt"
-                State.QueryString = "select DepositorMobile,sum(Amount) as Test" & _
-                                    " from transactions " & _
-                                    " where  depositdatetime between '" & StrFrom & "' and '" & Strto & "' " & _
-                                    " group by DepositorMobile " & _
+                State.QueryString = "select DepositorMobile,sum(Amount) as Test" &
+                                    " from transactions " &
+                                    " where  depositdatetime between '" & StrFrom & "' and '" & Strto & "' " &
+                                    " group by DepositorMobile " &
                                     " having sum(Amount) > 30000 "
 
                 State.DFrom = StrFrom
@@ -689,7 +689,7 @@ Partial Class Reports
                 Else
                     Branch = Session("Branch")
                 End If
-                State.QueryString = "select * from useractions where branch like '" & Branch & "' and actiondatetime between '" & StrFrom & "' and '" & Strto & "'" & _
+                State.QueryString = "select * from useractions where branch like '" & Branch & "' and actiondatetime between '" & StrFrom & "' and '" & Strto & "'" &
                                     " order by actiondatetime desc "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -701,7 +701,7 @@ Partial Class Reports
                 Response.Redirect("FinalRPT.aspx")
             ElseIf (drpd_RPT_Type.SelectedValue = 12) Then
                 State.ReportName = "Reports\BlockedDepositors.rpt"
-                State.QueryString = " select * from blockedcustomers " & _
+                State.QueryString = " select * from blockedcustomers " &
                                     " where DepositorOrBeneficiary=0 and unblocked=0 and blockdatetime between '" & StrFrom & "' and '" & Strto & "' "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -712,7 +712,7 @@ Partial Class Reports
             ElseIf (drpd_RPT_Type.SelectedValue = 13) Then
                 State.ReportName = "Reports\BlockedBeneficiaries.rpt"
 
-                State.QueryString = "select * from blockedcustomers " & _
+                State.QueryString = "select * from blockedcustomers " &
                                     " where DepositorOrBeneficiary=1 and unblocked=0 and blockdatetime between '" & StrFrom & "' and '" & Strto & "' "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -722,7 +722,7 @@ Partial Class Reports
                 Response.Redirect("FinalRPT.aspx")
             ElseIf (drpd_RPT_Type.SelectedValue = 14) Then
                 State.ReportName = "Reports\BlockingHistory.rpt"
-                State.QueryString = "select * from blockedcustomers " & _
+                State.QueryString = "select * from blockedcustomers " &
                                     " where unblocked=1 and blockdatetime between '" & StrFrom & "' and '" & Strto & "' "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -732,8 +732,8 @@ Partial Class Reports
                 Response.Redirect("FinalRPT.aspx")
             ElseIf (drpd_RPT_Type.SelectedValue = 15) Then
                 State.ReportName = "Reports\InvalidKeyTrials.rpt"
-                State.QueryString = "select T.*,ATM.ATMName,(select MaximumKeyTrials from Bank B where B.countrycode = T.countrycode and B.BankCode=T.BankCode) as KeyTrials,(select Count(*) from TransactionKeyCheckTrials TKCT where TKCT.TransactionCode=T.TransactionCode and TrialFlag=0) as TransactionTrials" & _
-                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " & _
+                State.QueryString = "select T.*,ATM.ATMName,(select MaximumKeyTrials from Bank B where B.countrycode = T.countrycode and B.BankCode=T.BankCode) as KeyTrials,(select Count(*) from TransactionKeyCheckTrials TKCT where TKCT.TransactionCode=T.TransactionCode and TrialFlag=0) as TransactionTrials" &
+                                    " FROM Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId " &
                                     " where T.atmid like '" & selected_ATM & "' and (T.DepositStatus='CONFIRMED' and T.WithdrawalStatus is null) OR ( T.DepositStatus = 'EXPIRED' and T.WithdrawalStatus = 'EXPIRED' ) and  T.depositdatetime between '" & StrFrom & "' and '" & Strto & "' "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -743,7 +743,7 @@ Partial Class Reports
                 Response.Redirect("FinalRPT.aspx")
             ElseIf (drpd_RPT_Type.SelectedValue = 18) Then
                 State.ReportName = "Reports\Users.rpt"
-                State.QueryString = "select users.userid,users.username,users.branch,users.ATM_ID ,groups.name " & _
+                State.QueryString = "select users.userid,users.username,users.branch,users.ATM_ID ,groups.name " &
                                     " from users inner join groups on users.group_id = groups.ID "
                 State.DFrom = StrFrom
                 State.DTo = Strto
@@ -803,9 +803,9 @@ Partial Class Reports
                 '                    " FROM Transactions transactions inner join TransactionNestedActions TN on transactions.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId   " & _
                 '                    " where ( depositstatus='CONFIRMED' or depositstatus='EXPIRED')and ( withdrawalstatus is null or withdrawalstatus= 'CANCELED')   and transactions.atmid like '" & selected_ATM & "' and TN.[action]='11'and TN.actionstatus='CONFIRMED'and TN.ActionDateTime between '" & StrFrom & "' and '" & Strto & "' "
 
-                State.QueryString = " select T.TransactionCode,T.ATMid,T.Amount,T.DepositStatus,T.withdrawalstatus,T.DepositDateTime, T.DepositorMobile, T.BeneficiaryMobile, TN.DispensedAmount, TN.CommissionAmount " & _
-                                    " from Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId    " & _
-                                    " where ( depositstatus='CONFIRMED' or depositstatus='EXPIRED')and ( withdrawalstatus is null or withdrawalstatus = 'EXPIRED' or withdrawalstatus = 'CANCELED') and TN.ActionDateTime between '" & StrFrom & "' and '" & Strto & "'   and T.atmid like '" & selected_ATM & "' and DispensedAmount <> 0" & _
+                State.QueryString = " select T.TransactionCode,T.ATMid,T.Amount,T.DepositStatus,T.withdrawalstatus,T.DepositDateTime, T.DepositorMobile, T.BeneficiaryMobile, TN.DispensedAmount, TN.CommissionAmount " &
+                                    " from Transactions T inner join TransactionNestedActions TN on T.transactioncode=TN.transactioncode inner join ATM ON TN.CountryCode = ATM.CountryCode AND TN.BankCode = ATM.BankCode AND TN.ATMId = ATM.ATMId    " &
+                                    " where ( depositstatus='CONFIRMED' or depositstatus='EXPIRED')and ( withdrawalstatus is null or withdrawalstatus = 'EXPIRED' or withdrawalstatus = 'CANCELED') and TN.ActionDateTime between '" & StrFrom & "' and '" & Strto & "'   and T.atmid like '" & selected_ATM & "' and DispensedAmount <> 0" &
                                     " group by T.TransactionCode,T.ATMid,T.Amount,T.DepositStatus,T.withdrawalstatus,T.DepositDateTime, T.DepositorMobile, T.BeneficiaryMobile,TN.DispensedAmount, TN.CommissionAmount "
 
 
@@ -835,6 +835,7 @@ Partial Class Reports
                 State.ATM = ""
                 Session.Add("Obj", State)
                 Response.Redirect("TransBalanceRPTView.aspx")
+
             End If
         Else
             Lbl_Status.Visible = True

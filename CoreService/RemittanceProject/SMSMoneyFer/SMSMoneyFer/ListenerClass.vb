@@ -42,7 +42,7 @@ Public Class ListnerClass
 
             mvListener = New System.Net.Sockets.TcpListener(ipAddress, mvLocalPort)
             mvListener.Start()
-            log.loglog("NCRMoneyFer starts listening  on port: " & mvLocalPort, False)
+            log.loglog("NCRMoneyFer starts listening  on port: " & mvLocalPort & " IP: " & ipAddress.ToString, False)
             mvStopListening = False
 
             While Not mvStopListening

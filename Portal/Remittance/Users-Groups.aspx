@@ -57,6 +57,18 @@
                                             Enabled="false" />
                 </ItemTemplate>
             </asp:TemplateField>
+              <asp:TemplateField HeaderText="Bulk Transactions Reports" SortExpression="Reports">
+                <FooterTemplate>
+                    <asp:CheckBox ID="CB_BulkTransactionsReports" runat="server" />
+                </FooterTemplate>
+                <EditItemTemplate>
+                    <asp:CheckBox ID="cb_BulkTransactionsReports_Edit" runat="server" Checked='<%# Bind("BulkTransactionsReports") %>' />
+                </EditItemTemplate>
+                <ItemTemplate>
+                    <asp:CheckBox ID="cb_BulkTransactionsReports_View" runat="server" Checked='<%# Bind("BulkTransactionsReports") %>' 
+                                            Enabled="false" />
+                </ItemTemplate>
+            </asp:TemplateField>
             <asp:TemplateField HeaderText="Maintenance" SortExpression="Maintenance">
                 <FooterTemplate>
                     <asp:CheckBox ID="CB_Maintenance" runat="server" />
@@ -131,11 +143,11 @@
     <asp:SqlDataSource ID="SqlDataSource2" runat="server" 
                                 ConnectionString="<%$ ConnectionStrings:NCRMoneyFerConnection %>" 
                                 DeleteCommand="DELETE FROM [Groups] WHERE [ID] = @original_ID" 
-                                InsertCommand="INSERT INTO [Groups] ([ID], [Name], [Reports], [Maintenance], [Administration], [Users], [Teller], [Registeration] ) VALUES (@ID, @Name, @Reports, @Maintenance, @Administration, @Users, @Teller,@Registeration)" 
+                                InsertCommand="INSERT INTO [Groups] ([ID], [Name], [Reports], [Maintenance], [Administration], [Users], [Teller], [Registeration],[BulkTransactionsReports] ) VALUES (@ID, @Name, @Reports, @Maintenance, @Administration, @Users, @Teller,@Registeration,@BulkTransactionsReports)" 
                                 OldValuesParameterFormatString="original_{0}" 
-                                SelectCommand="SELECT ID, Name, Reports, Maintenance, Administration, Users, Teller, Registeration FROM dbo.Groups" 
+                                SelectCommand="SELECT ID, Name, Reports, Maintenance, Administration, Users, Teller, Registeration, BulkTransactionsReports FROM dbo.Groups" 
                                 
-                                UpdateCommand="UPDATE [Groups] SET [Name] = @Name, [Reports] = @Reports, [Maintenance] = @Maintenance, [Administration] = @Administration, [Users] = @Users, [Teller] = @Teller , [Registeration] = @Registeration
+                                UpdateCommand="UPDATE [Groups] SET [Name] = @Name, [Reports] = @Reports, [Maintenance] = @Maintenance, [Administration] = @Administration, [Users] = @Users, [Teller] = @Teller , [Registeration] = @Registeration,BulkTransactionsReports = @BulkTransactionsReports
 WHERE [ID] = @original_ID">
                                 <DeleteParameters>
                                     <asp:Parameter Name="original_ID" Type="String" />
@@ -147,7 +159,9 @@ WHERE [ID] = @original_ID">
                                     <asp:Parameter Name="Administration" Type="Boolean" />
                                     <asp:Parameter Name="Users" Type="Boolean" />
                                     <asp:Parameter Name="Teller" Type="Boolean" />
+                                     <asp:Parameter Name="BulkTransactionsReports" Type="Boolean" />
                                     <asp:Parameter Name="Registeration" />
+                                    
                                     <asp:Parameter Name="original_ID" Type="String" />
                                 </UpdateParameters>
                                 <InsertParameters>
@@ -158,6 +172,8 @@ WHERE [ID] = @original_ID">
                                     <asp:Parameter Name="Administration" Type="Boolean" />
                                     <asp:Parameter Name="Users" Type="Boolean" />
                                     <asp:Parameter Name="Teller" Type="Boolean" />
+                                    <asp:Parameter Name="BulkTransactionsReports" Type="Boolean" />
+                                    
                                     <asp:Parameter Name="Registeration" />
                                 </InsertParameters>
                             </asp:SqlDataSource>

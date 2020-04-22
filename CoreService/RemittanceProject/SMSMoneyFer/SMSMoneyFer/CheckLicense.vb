@@ -18,14 +18,14 @@ Public Class CheckLicense
     End Sub
     Public Sub Timertask(ByVal stat As Object)
 
-        Dim st As StatClass2
+        Dim st As StatClass
         Dim Ret As Boolean
         Dim Ret2 As Boolean
         Dim Ret3 As Boolean
         Dim ATMsCount As Integer
         Dim DisabledATMno As Integer
         Try
-            st = CType(stat, StatClass2)
+            st = CType(stat, StatClass)
         Catch ex1 As Exception
             log.loglog("StarttimerTask Stat Object Conversion error ex:" & ex1.Message, False)
             stat = Nothing

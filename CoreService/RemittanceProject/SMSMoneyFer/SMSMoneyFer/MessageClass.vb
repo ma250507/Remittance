@@ -741,7 +741,7 @@ Public Class MessageClass
 
             Qstr = "select * from NewTransactions where "
             Qstr = Qstr & " transactioncode='" & pTrxCode & "' "
-
+            Qstr += " and NationalID like '%" & NationalID & "'"
             cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
             cn.Open()
             cmd = New System.Data.SqlClient.SqlCommand(Qstr, cn)
@@ -1117,7 +1117,7 @@ Public Class MessageClass
                 End If
 
 
-                rtrn = lUpdateRequestNew(cnst_RequestType_WithdrawalAuthorization)
+                rtrn = lUpdateRequestNew(cnst_RequestType_NewWithdrawalAuthorization)
 
                 If rtrn <> 0 Then
                     ResponseCode = rtrn.ToString("00000")
@@ -1139,7 +1139,7 @@ Public Class MessageClass
                     Return 0
                 End If
 
-                rtrn = lCheckPINs_Teller()
+                rtrn = lCheckPINsNew()
                 If rtrn <> 0 Then
 
                     ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
@@ -1161,14 +1161,14 @@ Public Class MessageClass
                 End If
 
 
-                lActionCode = cnst_RequestType_WithdrawalConfirmation
+
                 'If CONFIGClass.CheckForUncertainWithdrawalFlag = 1 Then
                 '    If ActionReason.ToUpper.Contains(CONFIGClass.UnCertainActionReason.ToUpper) = True Then
                 '        lActionCode = cnst_RequestType_WithdrawalUnCertain
                 '    End If
                 'End If
 
-                rtrn = lUpdateRequestNew(lActionCode)
+                rtrn = lUpdateRequestNew(cnst_RequestType_NewWithdrawalConfirmation)
 
                 If rtrn <> 0 Then
                     ResponseCode = cnst_ErrCode_DataBaseError.ToString("00000")
@@ -1190,14 +1190,14 @@ Public Class MessageClass
                     Return 0
                 End If
 
-                rtrn = lCheckPINs_Teller()
+                rtrn = lCheckPINsNew()
                 If rtrn <> 0 Then
                     ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
                     lNewFormReply(mvOutGoingNewReplyData)
                     Return 0
 
                 End If
-                rtrn = lUpdateRequestNew(cnst_RequestType_WithdrawalCancelation)
+                rtrn = lUpdateRequestNew(cnst_RequestType_NewWithdrawalCancelation)
 
                 If rtrn <> 0 Then
 
@@ -1218,7 +1218,7 @@ Public Class MessageClass
                     Return 0
                 End If
 
-                rtrn = lCheckPINs_Teller()
+                rtrn = lCheckPINsNew()
                 If rtrn <> 0 Then
                     ResponseCode = cnst_ErrCode_WrongPINs.ToString("00000")
                     lNewFormReply(mvOutGoingNewReplyData)
@@ -1260,8 +1260,8 @@ Public Class MessageClass
 
             ATMId = lIncomingRequestDataString(1)
             log.loglog("New Parsing ATMId: " & ATMId, False)
-
-            ATMDateTime = DateTime.Parse(lIncomingRequestDataString(2))
+            Dim _date As String = lIncomingRequestDataString(2)
+            ATMDateTime = New DateTime(_date.Substring(6, 4), _date.Substring(3, 2), _date.Substring(0, 2), _date.Substring(10, 2), _date.Substring(13, 2), _date.Substring(16, 2))
             log.loglog("New Parsing ATMDateTime: " & ATMDateTime, False)
 
             TransactionSequence = lIncomingRequestDataString(3)
@@ -1270,8 +1270,14 @@ Public Class MessageClass
             ResponseCode = lIncomingRequestDataString(4)
             log.loglog("New Parsing ResponseCode: " & ResponseCode, False)
 
-            NationalID = lIncomingRequestDataString(5)
-            log.loglog("New Parsing NationalID: " & NationalID, False)
+            Hosttransactioncode = lIncomingRequestDataString(5)
+            log.loglog("New Parsing Hosttransactioncode: " & Hosttransactioncode, False)
+
+            If RequestType = cnst_RequestType_NewWithdrawalAuthorization Then
+                NationalID = lIncomingRequestDataString(6)
+                log.loglog("New Parsing NationalID: " & NationalID, False)
+
+            End If
 
             Return 0
         Catch ex As Exception
@@ -3621,8 +3627,7 @@ nextRow:
             Qstr = "select * from NewTransactions  "
             Qstr += " where "
             Qstr += " TransactionCode='" & Hosttransactioncode & "'"
-            Qstr += " and   BankCode='" & CONFIGClass.LocalBank & "'"
-            Qstr += " and   CountryCode='" & CONFIGClass.LocalCountry & "'"
+            Qstr += " and NationalID like '%" & NationalID & "'"
             cn = New System.Data.SqlClient.SqlConnection(CONFIGClass.ConnectionString)
             cn.Open()
 
@@ -4243,11 +4248,17 @@ nextRow:
 
             If RequestType = cnst_RequestType_NewWithdrawalAuthorization Then
                 loutGoingNewReplyData += fs
-                loutGoingNewReplyData += DispensedAmount
+                loutGoingNewReplyData += DispensedAmount.ToString()
                 loutGoingNewReplyData += fs
-                loutGoingNewReplyData += CommissionAmount
+                loutGoingNewReplyData += CommissionAmount.ToString()
                 loutGoingNewReplyData += fs
-                loutGoingNewReplyData += DispensedNotes
+                loutGoingNewReplyData += DispensedNotes.ToString()
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += ReceiptLine1.ToString()
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += ReceiptLine2.ToString()
+                loutGoingNewReplyData += fs
+                loutGoingNewReplyData += ReceiptLine3.ToString()
             End If
 
             Return 0

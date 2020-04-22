@@ -21,6 +21,8 @@ Partial Class MasterPage
                 Btn_ChangePassword.Visible = False
                 Btn_Home.Visible = False
                 Btn_LogOut.Visible = False
+                BulkTransactionReports.Visible = False
+
             Else
                 If (perm.Administration = "True") Then
                     Admin.Visible = True
@@ -36,6 +38,11 @@ Partial Class MasterPage
                     Report.Visible = True
                 Else
                     Report.Visible = False
+                End If
+                If (perm.BulkTransactionsReports = "True") Then
+                    BulkTransactionReports.Visible = True
+                Else
+                    BulkTransactionReports.Visible = False
                 End If
                 If (perm.Users = "True") Then
                     Users.Visible = True

@@ -33,6 +33,7 @@ Partial Class test
         Me.btnArabiocxml = New System.Windows.Forms.Button()
         Me.Button10 = New System.Windows.Forms.Button()
         Me.Button11 = New System.Windows.Forms.Button()
+        Me.Button12 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Button1
@@ -161,11 +162,21 @@ Partial Class test
         Me.Button11.Text = "test Bulk"
         Me.Button11.UseVisualStyleBackColor = True
         '
+        'Button12
+        '
+        Me.Button12.Location = New System.Drawing.Point(424, 174)
+        Me.Button12.Name = "Button12"
+        Me.Button12.Size = New System.Drawing.Size(102, 23)
+        Me.Button12.TabIndex = 15
+        Me.Button12.Text = "test remittance"
+        Me.Button12.UseVisualStyleBackColor = True
+        '
         'test
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(560, 437)
+        Me.Controls.Add(Me.Button12)
         Me.Controls.Add(Me.Button11)
         Me.Controls.Add(Me.Button10)
         Me.Controls.Add(Me.btnArabiocxml)
@@ -200,4 +211,5 @@ Partial Class test
     Friend WithEvents btnArabiocxml As System.Windows.Forms.Button
     Friend WithEvents Button10 As System.Windows.Forms.Button
     Friend WithEvents Button11 As Button
+    Friend WithEvents Button12 As Button
 End Class
