@@ -5,7 +5,7 @@ Public Class NCRMoneyFerService
 
     Public Shared mvATMListener As ListnerClass
     Private mvMessage As MessageClass
-    Private mvchecklicense As CheckLicense
+    'Private mvchecklicense As CheckLicense
     Private mvATMListenerLocalPort As Long = 1000
     Private mvMaxConnectionInactiveTime As Long = 90 'seconds
     Private mvMaxConCurrentConnections As Long = 10
@@ -20,7 +20,7 @@ Public Class NCRMoneyFerService
         Try
             mvATMListener.StopListner()
             mvATMListener = Nothing
-
+            mvMessage = Nothing
         Catch ex As Exception
 
         End Try
@@ -33,8 +33,8 @@ Public Class NCRMoneyFerService
         Dim newThread As Thread
         Dim newThreadStartDP As ThreadStart
         Dim newThreadDP As Thread
-        Dim newThreadStartCheckLic As ThreadStart
-        Dim newThreadCheckLic As Thread
+        'Dim newThreadStartCheckLic As ThreadStart
+        'Dim newThreadCheckLic As Thread
         'Dim mvmonitor As Monitor
         'Dim newThreadStartHC As ThreadStart
         'Dim newThreadHC As Thread
@@ -80,14 +80,14 @@ Public Class NCRMoneyFerService
 
         End Try
 
-        Try
-            mvchecklicense = New CheckLicense
-            newThreadStartCheckLic = New ThreadStart(AddressOf mvchecklicense.start)
-            newThreadCheckLic = New Thread(newThreadStartCheckLic)
-            newThreadCheckLic.Start()
-        Catch ex As Exception
-            log.loglog("NCRMoneyFer, On Start, starting CheckLicense service error:" & ex.ToString(), True)
-        End Try
+        'Try
+        '    mvchecklicense = New CheckLicense
+        '    newThreadStartCheckLic = New ThreadStart(AddressOf mvchecklicense.start)
+        '    newThreadCheckLic = New Thread(newThreadStartCheckLic)
+        '    newThreadCheckLic.Start()
+        'Catch ex As Exception
+        '    log.loglog("NCRMoneyFer, On Start, starting CheckLicense service error:" & ex.ToString(), True)
+        'End Try
 
         Try
 
