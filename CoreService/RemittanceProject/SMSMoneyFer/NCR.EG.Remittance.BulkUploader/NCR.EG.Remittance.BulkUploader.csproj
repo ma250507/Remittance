@@ -87,5 +87,11 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\NCR.EG.Utilities\NCR.EG.Utilities\NCR.EG.Utilities.vbproj">
+      <Project>{2b0f35c8-9935-4943-83d4-f9c99b6659c9}</Project>
+      <Name>NCR.EG.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

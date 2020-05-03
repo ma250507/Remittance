@@ -1,0 +1,17 @@
+Header for all requests:
+	RequestTypeLunoATMDateTimeTransactionSequenceResponseCode
+
+Requests:
+
+[Header]	RequestTypeLunoATMDateTimeTransactionSequence
+[AUT]	--> [Header]	TrxCodeLast6Digit
+[CON]	--> [Header]	TrxCodeLast6Digit
+[CAN]	--> [Header]	TrxCodeLast6Digit
+[UNC]	--> [Header]	TrxCodeLast6Digit
+
+Responses:
+[Header]	RequestTypeLunoATMDateTimeTransactionSequenceResponseCode
+[AUT]	--> [Header]	DispensedAmountCommissionAmountDispensedNotes
+[CON]	--> [Header]
+[CAN]	--> [Header]
+[UNC]	--> [Header]
